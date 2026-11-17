@@ -1271,49 +1271,21 @@ function renderHub(root) {
 
     <h2 style="font-size: 20px; margin: 24px 0 14px;">Działy podręcznika</h2>
     <div class="modules-grid">
-      <!-- DZIAŁ I -->
-      <div class="module-card \${currentModuleId === 'd1' ? 'featured' : ''}">
+      <!-- DZIAŁ II: MOJA OKOLICA (GŁÓWNY MODUŁ NAJBLIŻSZEGO SPRAWDZIANU) -->
+      <div class="module-card featured" style="border: 2px solid var(--brand); box-shadow: 0 12px 32px rgba(23,61,52,0.12);">
         <div class="module-head">
           <div>
-            <div class="module-num" style="color:var(--green);">\${MODULES.d1.numStr} • s. \${MODULES.d1.pages}</div>
-            <h3 class="module-title">\${MODULES.d1.title}</h3>
-            <p class="module-desc">\${MODULES.d1.desc}</p>
-          </div>
-          <span class="status-pill status-active">\${MODULES.d1.badge}</span>
-        </div>
-        <div style="background:#eaf5eb; padding:12px 16px; border-radius:12px; font-size:13px; font-weight:600; color:var(--brand);">
-          🎯 W bazie czeka 75 zadań. Losowy test wybiera po 3 pytania z każdego z 5 tematów i miesza odpowiedzi!
-        </div>
-        <div class="module-actions">
-          <button class="accent" onclick="startRandomQuiz('d1')">🎲 Losowy test (15 pytań)</button>
-          <button class="primary" onclick="openLearnList('d1')">📖 Nauka krok po kroku</button>
-        </div>
-        <div style="margin-top:12px; text-align:center;">
-          <a href="javascript:void(0)" onclick="toggleFixedSets('d1')" style="font-size:12px; font-weight:700; color:var(--brand); text-decoration:underline;">Lub wybierz stały zestaw 1–5 ▾</a>
-          <div id="fixedSets_d1" style="display:none; gap:6px; flex-wrap:wrap; justify-content:center; margin-top:10px;">
-            \${[1, 2, 3, 4, 5].map(s => {
-              const done = (state.usedSets.d1 || []).includes(s);
-              return \`<button class="small \${done ? 'outline' : ''}" style="font-size:12px; padding:4px 10px;" onclick="startQuizSet('d1', \${s})">Zestaw \${s} \${done ? '✓' : ''}</button>\`;
-            }).join('')}
-          </div>
-        </div>
-      </div>
-
-      <!-- DZIAŁ II: MOJA OKOLICA -->
-      <div class="module-card featured">
-        <div class="module-head">
-          <div>
-            <div class="module-num" style="color:var(--green);">\${MODULES.d2.numStr} • s. \${MODULES.d2.pages} • Najbliższy sprawdzian</div>
-            <h3 class="module-title" style="font-size: 24px;">\${MODULES.d2.title}</h3>
+            <div class="module-num" style="color:var(--green); font-weight:800; font-size:13px;">🌟 NAJBLIŻSZY SPRAWDZIAN • \${MODULES.d2.numStr} • s. \${MODULES.d2.pages}</div>
+            <h3 class="module-title" style="font-size: 24px; color:var(--brand); margin-top:4px;">\${MODULES.d2.title}</h3>
             <p class="module-desc">\${MODULES.d2.desc}</p>
           </div>
-          <span class="status-pill status-active">\${MODULES.d2.badge}</span>
+          <span class="status-pill status-active" style="background:var(--lime); color:var(--brand); font-weight:800;">★ Główny sprawdzian</span>
         </div>
         <div style="background:#eaf5eb; padding:12px 16px; border-radius:12px; font-size:13px; font-weight:600; color:var(--brand);">
-          🎯 W bazie czeka 126 zadań. Każdy losowy test to unikalny mix 18 pytań (dokładnie po 3 z każdego z 6 tematów) ze zdjęciami z podręcznika!
+          🎯 W bazie czeka 126 zadań z Działu II. Każdy losowy test to unikalny mix 18 pytań (dokładnie po 3 z każdego z 6 tematów: krajobraz, ukształtowanie, skały, gleba, rośliny i zwierzęta) ze zdjęciami z podręcznika!
         </div>
         <div class="module-actions">
-          <button class="accent" onclick="startRandomQuiz('d2')">🎲 Losowy test (18 pytań)</button>
+          <button class="accent" style="font-size:16px; padding:14px 20px; font-weight:800;" onclick="startRandomQuiz('d2')">🎲 Losowy test — Dział II (18 pytań)</button>
           <button class="primary" onclick="openLearnList('d2')">📖 Nauka krok po kroku</button>
         </div>
         <div style="margin-top:12px; text-align:center;">
@@ -1322,6 +1294,34 @@ function renderHub(root) {
             \${[1, 2, 3, 4, 5, 6, 7].map(s => {
               const done = (state.usedSets.d2 || []).includes(s);
               return \`<button class="small \${done ? 'outline' : ''}" style="font-size:12px; padding:4px 10px;" onclick="startQuizSet('d2', \${s})">Zestaw \${s} \${done ? '✓' : ''}</button>\`;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+
+      <!-- DZIAŁ I: SPOTKANIE Z PRZYRODĄ (POPRZEDNI SPRAWDZIAN) -->
+      <div class="module-card">
+        <div class="module-head">
+          <div>
+            <div class="module-num" style="color:var(--muted);">\${MODULES.d1.numStr} • s. \${MODULES.d1.pages} • Poprzedni materiał</div>
+            <h3 class="module-title">\${MODULES.d1.title}</h3>
+            <p class="module-desc">\${MODULES.d1.desc}</p>
+          </div>
+          <span class="status-pill status-lock" style="font-size:11px;">Powtórka</span>
+        </div>
+        <div style="background:#f4f7f2; padding:12px 16px; border-radius:12px; font-size:13px; font-weight:600; color:var(--muted);">
+          🎯 W bazie czeka 75 zadań z Działu I (zmysły, mikroskop, kompas, zasady doświadczeń, higiena snu).
+        </div>
+        <div class="module-actions">
+          <button class="primary" onclick="startRandomQuiz('d1')">🎲 Losowy test — Dział I (15 pytań)</button>
+          <button class="outline" onclick="openLearnList('d1')">📖 Nauka krok po kroku</button>
+        </div>
+        <div style="margin-top:12px; text-align:center;">
+          <a href="javascript:void(0)" onclick="toggleFixedSets('d1')" style="font-size:12px; font-weight:700; color:var(--brand); text-decoration:underline;">Lub wybierz stały zestaw 1–5 ▾</a>
+          <div id="fixedSets_d1" style="display:none; gap:6px; flex-wrap:wrap; justify-content:center; margin-top:10px;">
+            \${[1, 2, 3, 4, 5].map(s => {
+              const done = (state.usedSets.d1 || []).includes(s);
+              return \`<button class="small \${done ? 'outline' : ''}" style="font-size:12px; padding:4px 10px;" onclick="startQuizSet('d1', \${s})">Zestaw \${s} \${done ? '✓' : ''}</button>\`;
             }).join('')}
           </div>
         </div>
@@ -2349,8 +2349,8 @@ function renderQuiz(root) {
   root.innerHTML = \`
     <div class="top-bar-quiz">
       <button class="small" onclick="quitQuiz()">✕ Zakończ test</button>
-      <span class="status-pill status-active">
-        \${mod.numStr} • \${typeof activeQuizSet === 'number' ? 'Zestaw ' + activeQuizSet + ' z ' + mod.maxSets : 'Losowy test'} • Zadanie \${quizQIndex + 1} / \${quizQuestions.length}
+      <span class="status-pill status-active" style="font-weight:800; font-size:12px;">
+        🌟 \${mod.title} (\${mod.numStr}) • Zadanie \${quizQIndex + 1} z \${quizQuestions.length}
       </span>
     </div>
 

@@ -445,17 +445,17 @@ module.exports = [
     src: '74–76'
   },
   {
-    id: 'z2_t5_3', set: 2, topic: 4, skill: 'O02', type: 'order',
-    q: 'Uporządkuj etapy planowania doświadczenia przyrodniczego:',
-    items: [
-      'Postawienie pytania badawczego i hipotezy',
-      'Przygotowanie dwóch prób: badawczej i kontrolnej',
-      'Prowadzenie obserwacji przy zmianie tylko jednego czynnika',
-      'Wyciągnięcie końcowego wniosku'
+    id: 'z2_t5_3', set: 2, topic: 4, skill: 'O01', type: 'choice',
+    q: 'Uczeń zwilżył próbkę gleby z ogrodu i bez problemu uformował z niej gładki wałeczek, który nie pękał i lepił się do dłoni. Jaki składnik dominuje w tej glebie?',
+    opts: [
+      'Glina — jest drobnoziarnista, lepka i bardzo plastyczna po zmoczeniu.',
+      'Piasek — jest sypki i od razu rozsypuje się w palcach.',
+      'Czysty żwir — ma ostre, duże kamyki.',
+      'Skała lita — nie daje się zmoczyć ani ugnieść.'
     ],
-    correctOrder: [0, 1, 2, 3],
-    why: 'Naukowiec najpierw pyta i przypuszcza, przygotowuje próby, obserwuje z zachowaniem reguły 1 zmiennej i wyciąga wniosek.',
-    src: '76'
+    a: 0,
+    why: 'Gleba gliniasta po dodaniu wody pozwala formować trwałe wałeczki i kulki, ponieważ cząstki gliny mocno się ze sobą zlepiają.',
+    src: '75'
   },
 
   // T6: Rośliny i zwierzęta
