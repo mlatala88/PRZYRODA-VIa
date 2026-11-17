@@ -909,8 +909,13 @@ button.outline {
     <input type="url" id="rankingEndpointInput" placeholder="https://script.google.com/macros/s/.../exec" style="width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:10px; font-size:13px; margin-bottom:16px;">
 
     <div style="display:flex; gap:8px; justify-content:flex-end;">
-      <button class="small outline" onclick="clearRankingEndpoint()">Wyczyść (użyj lokalnego)</button>
+      <button class="small outline" onclick="clearRankingEndpoint()">Odłącz arkusz</button>
       <button class="primary small" onclick="saveRankingEndpoint()">Zapisz i połącz</button>
+    </div>
+
+    <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--line); display:flex; justify-content:space-between; align-items:center;">
+      <span style="font-size:12px; color:var(--muted);">Pamięć tego telefonu:</span>
+      <button class="small outline" style="color:var(--red); border-color:#ffcdd2; font-size:12px;" onclick="clearLocalRankingCache()">🗑️ Wyczyść lokalną listę</button>
     </div>
   </div>
 </div>
@@ -1124,6 +1129,16 @@ function clearRankingEndpoint() {
   } catch(e) {}
   closeRankingSettings();
   showToast('Używasz lokalnej bazy na tym urządzeniu.');
+  refreshRanking();
+}
+
+function clearLocalRankingCache() {
+  try {
+    localStorage.removeItem('odkrywam_local_leaderboard');
+  } catch(e) {}
+  leaderboardList = [];
+  closeRankingSettings();
+  showToast('🗑️ Lokalna pamięć wyników wyczyszczona!');
   refreshRanking();
 }
 
