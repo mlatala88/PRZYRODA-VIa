@@ -1020,8 +1020,8 @@ function loadPlayerProfile() {
 
 let playerProfile = loadPlayerProfile();
 let selectedModalAvatar = playerProfile.avatar || '🦉';
-const DEFAULT_RANKING_URL = ''; // Wklej tutaj wygenerowany URL Web App Google Sheets
-let rankingEndpoint = localStorage.getItem('odkrywam_ranking_url') || DEFAULT_RANKING_URL || '';
+const DEFAULT_RANKING_URL = 'https://script.google.com/macros/s/AKfycbyp7jZljx84q3QJ2oBtv3IykYGqbsJrckiY1FqyIhFahvgSdjtJ7KidQ3LfFSyI_KsQbA/exec';
+let rankingEndpoint = localStorage.getItem('odkrywam_ranking_url') || DEFAULT_RANKING_URL;
 let rankingFilter = 'all';
 let rankingLoading = false;
 let leaderboardList = [];
@@ -1167,7 +1167,11 @@ async function submitScoreToLeaderboard(entry) {
       pct: entry.pct,
       date: entry.date
     });
-    await fetch(rankingEndpoint + '?' + params.toString(), { method: 'GET', mode: 'no-cors' });
+    try {
+      await fetch(rankingEndpoint + '?' + params.toString());
+    } catch(err) {
+      await fetch(rankingEndpoint + '?' + params.toString(), { mode: 'no-cors' });
+    }
     return { success: true, localOnly: false };
   } catch(e) {
     console.warn('Online score submission failed:', e);
@@ -2863,6 +2867,13 @@ function renderRanking(root) {
             else if (isTop3) borderStyle = 'border:1px solid #d97706; background:#fffaf0;';
 
             const pctVal = entry.pct !== undefined ? entry.pct : Math.round((entry.score / (entry.total || 18)) * 100);
+            let dateStr = entry.date || '';
+            if (dateStr && typeof dateStr === 'string' && dateStr.includes('T')) {
+              try {
+                const d = new Date(dateStr);
+                dateStr = d.toLocaleDateString('pl-PL', { day: '2-digit', month: '2-digit' }) + ' ' + d.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+              } catch(e) {}
+            }
 
             return `
               <div style="${borderStyle} padding:12px 14px; border-radius:14px; display:flex; align-items:center; justify-content:space-between; gap:12px;">
@@ -2873,7 +2884,7 @@ function renderRanking(root) {
                     <strong style="font-size:15px; color:var(--brand); display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                       ${entry.name || 'Odkrywca'}
                     </strong>
-                    <span style="font-size:11px; color:var(--muted);">${entry.module || 'Test'} • ${entry.date || ''}</span>
+                    <span style="font-size:11px; color:var(--muted);">${entry.module || 'Test'} • ${dateStr}</span>
                   </div>
                 </div>
                 <div style="text-align:right; flex-shrink:0;">
