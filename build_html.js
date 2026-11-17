@@ -530,6 +530,67 @@ button.outline {
   font-size: 14px;
 }
 
+/* NAWIGACJA PO KROKACH NAUKI */
+.status-in-progress { background: #fff8e1; color: #b78103; }
+.step-mini-btn {
+  width: 28px;
+  height: 28px;
+  min-height: 28px;
+  padding: 0;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.step-mini-btn:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+.step-mini-btn.done {
+  background: var(--green-soft);
+  border-color: #a5d6a7;
+  color: var(--green);
+}
+.step-nav-pill {
+  padding: 4px 10px;
+  min-height: 32px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.step-nav-pill.active {
+  background: var(--brand);
+  color: #ffffff;
+  border-color: var(--brand);
+}
+.step-nav-pill.done {
+  border-color: var(--green);
+}
+.pair-tag {
+  font-size: 11px;
+  font-weight: 800;
+  background: var(--lime);
+  color: var(--brand);
+  padding: 2px 8px;
+  border-radius: 8px;
+  margin-left: 6px;
+  white-space: nowrap;
+}
+
 /* KARTY ZE ZDJĘCIAMI W TRYBIE NAUKA */
 .learn-card {
   background: #ffffff;
@@ -759,7 +820,10 @@ button.outline {
     <div class="brand-icon">🌱</div>
     <span>Odkrywam Przyrodę 4</span>
   </div>
-  <div id="topMeta" class="nav-pill" onclick="currentView='hub'; render();">Odkrywca 🌿</div>
+  <div style="display:flex; gap:8px; align-items:center;">
+    <button class="small outline" style="color:#fff; border-color:rgba(255,255,255,0.4); font-size:12px; padding:4px 10px; min-height:30px; border-radius:14px; background:rgba(255,255,255,0.12);" onclick="resetAllProgress()">🔄 Nowy uczeń</button>
+    <div id="topMeta" class="nav-pill" onclick="currentView='hub'; render();">Odkrywca 🌿</div>
+  </div>
 </header>
 
 <main class="app-wrap" id="appMain"></main>
@@ -811,6 +875,7 @@ function loadState() {
           d1: (p.usedSets && Array.isArray(p.usedSets.d1)) ? p.usedSets.d1 : [],
           d2: Array.isArray(p.usedSets) ? p.usedSets : ((p.usedSets && p.usedSets.d2) ? p.usedSets.d2 : [])
         },
+        testsCount: p.testsCount || 0,
         history: p.history || [],
         completedLearnSteps: p.completedLearnSteps || {}
       };
@@ -819,6 +884,7 @@ function loadState() {
   return {
     currentModuleId: 'd2',
     usedSets: { d1: [], d2: [] },
+    testsCount: 0,
     history: [],
     completedLearnSteps: {}
   };
@@ -836,11 +902,12 @@ let state = loadState();
 // ROUTING I ZMIENNE APLIKACJI
 // ==========================================
 let currentModuleId = state.currentModuleId || 'd2';
-let currentView = 'hub'; // 'hub' | 'learn_list' | 'learn_step' | 'quiz' | 'results'
+let currentView = 'hub'; // 'hub' | 'learn_list' | 'learn_step' | 'learn_topic_done' | 'quiz' | 'results'
 let currentTopicIdx = 0;
 let currentStepIdx = 0;
 let activeQuizSet = 1;
 let quizQuestions = [];
+let lastQuizQuestions = [];
 let quizQIndex = 0;
 let quizScore = 0;
 let quizTopicScores = [];
@@ -850,7 +917,7 @@ let quizAnswersLog = [];
 let quizSelection = null;
 let quizBinsState = {};
 let quizOrderState = [];
-let quizMatchState = { selectedLeft: null, pairs: {} };
+let quizMatchState = { selectedLeft: null, pairs: {}, rightItems: [] };
 let activeDiscoveryIdx = null;
 
 function render() {
@@ -858,6 +925,7 @@ function render() {
   if (currentView === 'hub') renderHub(root);
   else if (currentView === 'learn_list') renderLearnList(root);
   else if (currentView === 'learn_step') renderLearnStep(root);
+  else if (currentView === 'learn_topic_done') renderLearnTopicDone(root);
   else if (currentView === 'quiz') renderQuiz(root);
   else if (currentView === 'results') renderResults(root);
 }
@@ -868,17 +936,18 @@ function render() {
 function renderHub(root) {
   const d1Completed = (state.usedSets.d1 || []).length;
   const d2Completed = (state.usedSets.d2 || []).length;
-  const totalCompleted = d1Completed + d2Completed;
+  const testsCount = state.testsCount || (d1Completed + d2Completed);
 
   root.innerHTML = \`
     <div class="hero-card">
       <div style="font-size: 12px; font-weight:800; letter-spacing:1.5px; opacity:0.8; text-transform:uppercase;">Nowa Era • Klasa 4</div>
       <h1>Cześć, Odkrywco! 🌿</h1>
-      <p>Przed Tobą interaktywny podręcznik przyrody dla klasy 4 („Odkrywam przyrodę”, Nowa Era). Wybierz dział, poznawaj wiedzę krok po kroku w trybie <strong>Nauka</strong> ze zdjęciami z podręcznika, a potem sprawdź się w quizach powtórkowych!</p>
+      <p>Przed Tobą interaktywny podręcznik przyrody dla klasy 4 („Odkrywam przyrodę”, Nowa Era). Wybierz dział, poznawaj wiedzę krok po kroku w trybie <strong>Nauka</strong> ze zdjęciami z podręcznika, a potem sprawdź się w <strong>losowych testach powtórkowych</strong>!</p>
       <div class="hero-meta">
-        <span class="meta-chip">📚 Dział I: \${d1Completed} / \${MODULES.d1.maxSets} zestawów</span>
-        <span class="meta-chip">📚 Dział II: \${d2Completed} / \${MODULES.d2.maxSets} zestawów</span>
-        <span class="meta-chip">🏆 Rozwiązane testy: \${totalCompleted}</span>
+        <span class="meta-chip">📚 Dział I: 75 pytań (5 tematów)</span>
+        <span class="meta-chip">📚 Dział II: 126 pytań (6 tematów)</span>
+        <span class="meta-chip">🏆 Rozwiązane testy: \${testsCount}</span>
+        <span class="meta-chip">🎲 Zawsze losowe zestawy</span>
       </div>
       <div style="margin-top:16px;">
         <button class="small outline" style="color:#fff; border-color:rgba(255,255,255,0.45); background:rgba(255,255,255,0.12);" onclick="shareApp()">📲 Udostępnij test rodzicom / Kopiuj link</button>
@@ -898,11 +967,20 @@ function renderHub(root) {
           <span class="status-pill status-active">\${MODULES.d1.badge}</span>
         </div>
         <div style="background:#eaf5eb; padding:12px 16px; border-radius:12px; font-size:13px; font-weight:600; color:var(--brand);">
-          🎯 W bazie czeka 5 zestawów testowych (75 zadań). Za każdym podejściem otrzymujesz nowe pytania!
+          🎯 W bazie czeka 75 zadań. Losowy test wybiera po 3 pytania z każdego z 5 tematów i miesza odpowiedzi!
         </div>
         <div class="module-actions">
-          <button class="primary" onclick="openLearnList('d1')">📖 Nauka (5 tematów)</button>
-          <button class="accent" onclick="startQuizAuto('d1')">🎯 Sprawdź wiedzę (Test 15 pytań)</button>
+          <button class="accent" onclick="startRandomQuiz('d1')">🎲 Losowy test (15 pytań)</button>
+          <button class="primary" onclick="openLearnList('d1')">📖 Nauka krok po kroku</button>
+        </div>
+        <div style="margin-top:12px; text-align:center;">
+          <a href="javascript:void(0)" onclick="toggleFixedSets('d1')" style="font-size:12px; font-weight:700; color:var(--brand); text-decoration:underline;">Lub wybierz stały zestaw 1–5 ▾</a>
+          <div id="fixedSets_d1" style="display:none; gap:6px; flex-wrap:wrap; justify-content:center; margin-top:10px;">
+            \${[1, 2, 3, 4, 5].map(s => {
+              const done = (state.usedSets.d1 || []).includes(s);
+              return \`<button class="small \${done ? 'outline' : ''}" style="font-size:12px; padding:4px 10px;" onclick="startQuizSet('d1', \${s})">Zestaw \${s} \${done ? '✓' : ''}</button>\`;
+            }).join('')}
+          </div>
         </div>
       </div>
 
@@ -917,11 +995,20 @@ function renderHub(root) {
           <span class="status-pill status-active">\${MODULES.d2.badge}</span>
         </div>
         <div style="background:#eaf5eb; padding:12px 16px; border-radius:12px; font-size:13px; font-weight:600; color:var(--brand);">
-          🎯 W bazie czeka 7 różnych zestawów testowych (126 zadań). Pełna rotacja pytań (3–7 podejść bez powtórek)!
+          🎯 W bazie czeka 126 zadań. Każdy losowy test to unikalny mix 18 pytań (dokładnie po 3 z każdego z 6 tematów) ze zdjęciami z podręcznika!
         </div>
         <div class="module-actions">
-          <button class="primary" onclick="openLearnList('d2')">📖 Nauka (6 tematów)</button>
-          <button class="accent" onclick="startQuizAuto('d2')">🎯 Sprawdź wiedzę (Test 18 pytań)</button>
+          <button class="accent" onclick="startRandomQuiz('d2')">🎲 Losowy test (18 pytań)</button>
+          <button class="primary" onclick="openLearnList('d2')">📖 Nauka krok po kroku</button>
+        </div>
+        <div style="margin-top:12px; text-align:center;">
+          <a href="javascript:void(0)" onclick="toggleFixedSets('d2')" style="font-size:12px; font-weight:700; color:var(--brand); text-decoration:underline;">Lub wybierz stały zestaw 1–7 ▾</a>
+          <div id="fixedSets_d2" style="display:none; gap:6px; flex-wrap:wrap; justify-content:center; margin-top:10px;">
+            \${[1, 2, 3, 4, 5, 6, 7].map(s => {
+              const done = (state.usedSets.d2 || []).includes(s);
+              return \`<button class="small \${done ? 'outline' : ''}" style="font-size:12px; padding:4px 10px;" onclick="startQuizSet('d2', \${s})">Zestaw \${s} \${done ? '✓' : ''}</button>\`;
+            }).join('')}
+          </div>
         </div>
       </div>
 
@@ -950,17 +1037,50 @@ function renderHub(root) {
     </div>
 
     <div style="margin-top: 30px; text-align: center;">
-      <button class="small outline" style="color:var(--muted);" onclick="resetProgress()">↺ Wyzeruj postępy na tym urządzeniu</button>
+      <button class="small outline" style="color:var(--muted);" onclick="resetAllProgress()">↺ Wyzeruj postępy na tym urządzeniu</button>
     </div>
   \`;
 }
 
-function resetProgress() {
-  if (confirm('Czy na pewno chcesz zresetować zapisane podejścia do testów dla wszystkich działów?')) {
-    state = { currentModuleId: 'd2', usedSets: { d1: [], d2: [] }, history: [], completedLearnSteps: {} };
+function toggleFixedSets(modId) {
+  const el = document.getElementById('fixedSets_' + modId);
+  if (!el) return;
+  el.style.display = (el.style.display === 'none' || !el.style.display) ? 'flex' : 'none';
+}
+
+function resetAllProgress() {
+  if (confirm('Czy chcesz wyczyścić wszystkie postępy i rozpocząć jako nowy uczeń?')) {
+    state = {
+      currentModuleId: 'd2',
+      usedSets: { d1: [], d2: [] },
+      testsCount: 0,
+      history: [],
+      completedLearnSteps: {}
+    };
     saveState();
+    showToast('Wszystkie postępy zostały zresetowane. Witaj nowy Odkrywco!');
+    currentView = 'hub';
     render();
   }
+}
+
+function resetModuleLearnSteps(modId) {
+  const mod = MODULES[modId];
+  if (confirm('Czy chcesz zresetować postępy w trybie Nauka dla: ' + mod.title + '?')) {
+    mod.topics.forEach(t => {
+      delete state.completedLearnSteps[t.id];
+    });
+    saveState();
+    showToast('Postępy w nauce dla tego działu zostały wyzerowane.');
+    render();
+  }
+}
+
+function resetTopicSteps(topicId) {
+  delete state.completedLearnSteps[topicId];
+  saveState();
+  showToast('Postęp w tym temacie został wyzerowany.');
+  render();
 }
 
 // ----------------------------------------------------
@@ -980,8 +1100,18 @@ function renderLearnList(root) {
     const doneSteps = (state.completedLearnSteps[t.id] || []).length;
     const totalSteps = t.steps.length;
     const isDone = doneSteps >= totalSteps;
+
+    // Znajdź pierwszy nieukończony krok
+    let nextStepIdx = 0;
+    for (let s = 0; s < totalSteps; s++) {
+      if (!(state.completedLearnSteps[t.id] || []).includes(s)) {
+        nextStepIdx = s;
+        break;
+      }
+    }
+
     listHtml += \`
-      <div class="module-card" style="cursor:pointer;" onclick="openLearnTopic(\${idx})">
+      <div class="module-card">
         <div class="module-head">
           <div style="display:flex; gap:14px; align-items:center;">
             <div style="font-size:32px;">\${t.icon}</div>
@@ -991,24 +1121,48 @@ function renderLearnList(root) {
               <p class="module-desc" style="font-size:13px;">\${t.intro}</p>
             </div>
           </div>
-          <span class="status-pill \${isDone ? 'status-active' : 'status-lock'}">
-            \${isDone ? '✓ Ukończony' : doneSteps + '/' + totalSteps + ' kroków'}
+          <span class="status-pill \${isDone ? 'status-active' : (doneSteps > 0 ? 'status-in-progress' : 'status-lock')}">
+            \${isDone ? '✓ Ukończony 🏆' : (doneSteps > 0 ? doneSteps + '/' + totalSteps + ' kroków' : 'Do zrobienia')}
           </span>
+        </div>
+
+        <!-- Mini-przyciski nawigacji po krokach -->
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin:12px 0 8px; align-items:center;">
+          <span style="font-size:12px; font-weight:700; color:var(--muted); margin-right:4px;">Kroki tematu:</span>
+          \${t.steps.map((st, sIdx) => {
+            const stepDone = (state.completedLearnSteps[t.id] || []).includes(sIdx);
+            return \`<button class="step-mini-btn \${stepDone ? 'done' : ''}" onclick="openLearnTopic(\${idx}, \${sIdx});" title="\${st.title}">
+              \${sIdx + 1}\${stepDone ? '✓' : ''}
+            </button>\`;
+          }).join('')}
+        </div>
+
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
+          \${isDone ? \`
+            <button class="small primary" onclick="openLearnTopic(\${idx}, 0)">🔄 Ucz się od nowa</button>
+            <button class="small outline" onclick="resetTopicSteps('\${t.id}')">Wyczyść postęp</button>
+          \` : (doneSteps > 0 ? \`
+            <button class="small primary" onclick="openLearnTopic(\${idx}, \${nextStepIdx})">Kontynuuj (krok \${nextStepIdx + 1}) →</button>
+            <button class="small outline" onclick="openLearnTopic(\${idx}, 0)">🔄 Od początku</button>
+          \` : \`
+            <button class="small primary" onclick="openLearnTopic(\${idx}, 0)">Rozpocznij naukę →</button>
+          \`)}
         </div>
       </div>
     \`;
   });
 
   root.innerHTML = \`
-    <div style="margin-bottom: 16px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
       <button class="small" onclick="currentView='hub'; render();">← Wróć do ekranu głównego</button>
+      <button class="small outline" style="color:var(--muted);" onclick="resetModuleLearnSteps('\${currentModuleId}')">🔄 Zresetuj postępy w tym dziale</button>
     </div>
     <div class="panel">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
         <h2 style="margin:0; font-size:22px;">📖 Wybierz temat do nauki — \${mod.title} (\${mod.pages})</h2>
       </div>
       <p style="color:var(--muted); font-size:14px; margin-bottom:20px;">
-        W każdym temacie znajdziesz proste wyjaśnienia, interaktywne schematy oraz przykłady z podręcznika zgodne z wymaganiami szkolnymi.
+        W każdym temacie znajdziesz proste wyjaśnienia, interaktywne schematy oraz zdjęcia wycięte z podręcznika. Możesz w każdej chwili powtórzyć dowolny krok!
       </p>
       <div style="display:flex; flex-direction:column; gap:12px;">
         \${listHtml}
@@ -1017,11 +1171,17 @@ function renderLearnList(root) {
   \`;
 }
 
-function openLearnTopic(idx) {
+function openLearnTopic(idx, stepIdx = 0) {
   currentTopicIdx = idx;
-  currentStepIdx = 0;
+  currentStepIdx = stepIdx;
   activeDiscoveryIdx = null;
   currentView = 'learn_step';
+  render();
+}
+
+function goToStep(sIdx) {
+  currentStepIdx = sIdx;
+  activeDiscoveryIdx = null;
   render();
 }
 
@@ -1376,6 +1536,17 @@ function renderLearnStep(root) {
     bodyHtml += \`<div style="background:#e8f5e9; border-left:4px solid var(--green); padding:12px 16px; border-radius:8px; font-size:14px; margin-top:14px;">💡 <strong>Ciekawostka:</strong> \${step.tip}</div>\`;
   }
 
+  // Pasek nawigacyjny kroków na górze karty
+  let stepPillsHtml = '<div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; align-items:center;">';
+  topic.steps.forEach((st, sIdx) => {
+    const isCur = (sIdx === currentStepIdx);
+    const isDone = (state.completedLearnSteps[topic.id] || []).includes(sIdx);
+    stepPillsHtml += \`<button class="step-nav-pill \${isCur ? 'active' : ''} \${isDone ? 'done' : ''}" onclick="goToStep(\${sIdx})">
+      Krok \${sIdx + 1}\${isDone && !isCur ? ' ✓' : ''}
+    </button>\`;
+  });
+  stepPillsHtml += '</div>';
+
   root.innerHTML = \`
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
       <button class="small" onclick="currentView='learn_list'; render();">← Spis tematów</button>
@@ -1383,6 +1554,8 @@ function renderLearnStep(root) {
     </div>
 
     <div class="panel">
+      \${stepPillsHtml}
+
       <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
         <div>
           <span class="status-pill status-active" style="margin-bottom:6px; display:inline-block;">\${step.badge || 'Wiedza'}</span>
@@ -1399,7 +1572,7 @@ function renderLearnStep(root) {
         <button class="small" \${currentStepIdx === 0 ? 'disabled' : ''} onclick="prevStep()">← Poprzedni</button>
         \${currentStepIdx < totalSteps - 1 
           ? \`<button class="primary" onclick="nextStep()">Następny krok →</button>\` 
-          : \`<button class="accent" onclick="finishTopic()">✓ Zakończ temat</button>\`
+          : \`<button class="accent" onclick="finishTopic()">✓ Zakończ temat 🏆</button>\`
         }
       </div>
     </div>
@@ -1431,8 +1604,7 @@ function finishTopic() {
   const mod = MODULES[currentModuleId];
   const topic = mod.topics[currentTopicIdx];
   markStepDone(topic.id, currentStepIdx);
-  alert('Brawo! Ukończyłeś cały temat: ' + topic.title);
-  currentView = 'learn_list';
+  currentView = 'learn_topic_done';
   render();
 }
 function markStepDone(topicId, stepIdx) {
@@ -1443,37 +1615,132 @@ function markStepDone(topicId, stepIdx) {
   }
 }
 
+// Ekran gratulacji po ukończeniu całego tematu
+function renderLearnTopicDone(root) {
+  const mod = MODULES[currentModuleId];
+  const topic = mod.topics[currentTopicIdx];
+  const hasNext = currentTopicIdx < mod.topics.length - 1;
+  const nextTopic = hasNext ? mod.topics[currentTopicIdx + 1] : null;
+
+  root.innerHTML = \`
+    <div class="panel" style="text-align:center; padding:32px 20px;">
+      <div style="font-size:52px; margin-bottom:12px;">🎉</div>
+      <span class="status-pill status-active" style="margin-bottom:10px;">Temat ukończony!</span>
+      <h2 style="font-size:26px; margin:8px 0 12px; color:var(--brand);">\${topic.icon} \${topic.title}</h2>
+      <p style="color:var(--muted); font-size:15px; max-width:540px; margin:0 auto 24px;">
+        Wspaniała robota! Przeszedłeś przez wszystkie kroki i zdjęcia z tego tematu (s. \${topic.pages}). Wiedza jest utrwalona!
+      </p>
+
+      <div style="display:flex; flex-direction:column; gap:12px; max-width:420px; margin:0 auto;">
+        \${hasNext ? \`
+          <button class="primary" onclick="openLearnTopic(\${currentTopicIdx + 1}, 0)">
+            Przejdź do kolejnego tematu: \${nextTopic.icon} \${nextTopic.title} →
+          </button>
+        \` : ''}
+        <button class="accent" onclick="startRandomQuiz('\${currentModuleId}')">
+          🎲 Sprawdź wiedzę w losowym teście
+        </button>
+        <button class="outline" onclick="openLearnTopic(\${currentTopicIdx}, 0)">
+          🔄 Powtórz ten temat od początku (Krok 1)
+        </button>
+        <button onclick="currentView='learn_list'; render();">
+          📖 Wróć do spisu tematów
+        </button>
+      </div>
+    </div>
+  \`;
+  setTimeout(() => fireConfetti(), 180);
+}
+
 // ----------------------------------------------------
-// 4. TRYB TESTU (SPRAWDŹ WIEDZĘ)
+// 4. TRYB TESTU (LOSOWY GENERATOR I STAŁE ZESTAWY)
 // ----------------------------------------------------
-function startQuizAuto(modId) {
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function cloneAndShuffleQuestion(orig) {
+  const q = JSON.parse(JSON.stringify(orig));
+  if (q.type === 'choice') {
+    const optsWithFlag = orig.opts.map((opt, idx) => ({
+      opt: opt,
+      isCorrect: idx === orig.a
+    }));
+    shuffleArray(optsWithFlag);
+    q.opts = optsWithFlag.map(x => x.opt);
+    q.a = optsWithFlag.findIndex(x => x.isCorrect);
+  } else if (q.type === 'multichoice') {
+    const optsWithFlag = orig.opts.map((opt, idx) => ({
+      opt: opt,
+      isCorrect: orig.correctIndices.includes(idx)
+    }));
+    shuffleArray(optsWithFlag);
+    q.opts = optsWithFlag.map(x => x.opt);
+    q.correctIndices = optsWithFlag
+      .map((x, idx) => x.isCorrect ? idx : -1)
+      .filter(idx => idx !== -1);
+  }
+  return q;
+}
+
+// Zawsze świeży, zbalansowany losowy test: dokładnie po 3 pytania z każdego tematu
+function startRandomQuiz(modId) {
   if (modId) currentModuleId = modId;
   const mod = MODULES[currentModuleId];
-  if (!state.usedSets[currentModuleId]) state.usedSets[currentModuleId] = [];
 
-  let nextSet = 1;
-  for (let s = 1; s <= mod.maxSets; s++) {
-    if (!state.usedSets[currentModuleId].includes(s)) {
-      nextSet = s;
-      break;
-    }
+  const questionsByTopic = {};
+  for (let t = 0; t < mod.topics.length; t++) {
+    questionsByTopic[t] = mod.questions.filter(q => q.topic === t);
   }
-  if (state.usedSets[currentModuleId].length >= mod.maxSets) {
-    alert('Rozwiązałeś już wszystkie ' + mod.maxSets + ' zestawów z tego działu! Rozpoczynamy nową serię powtórkową.');
-    state.usedSets[currentModuleId] = [];
-    saveState();
-    nextSet = 1;
+
+  let chosen = [];
+  for (let t = 0; t < mod.topics.length; t++) {
+    const pool = questionsByTopic[t] || [];
+    const shuffledPool = shuffleArray([...pool]);
+    chosen = chosen.concat(shuffledPool.slice(0, 3));
   }
-  startQuiz(nextSet);
+
+  quizQuestions = chosen.map(q => cloneAndShuffleQuestion(q));
+  lastQuizQuestions = JSON.parse(JSON.stringify(quizQuestions));
+
+  activeQuizSet = 'Losowy test';
+  quizQIndex = 0;
+  quizScore = 0;
+  quizTopicScores = new Array(mod.topics.length).fill(0);
+  quizAnswersLog = [];
+  initQuestionState();
+  currentView = 'quiz';
+  render();
+}
+
+function startQuizSet(modId, setNum) {
+  if (modId) currentModuleId = modId;
+  startQuiz(setNum);
 }
 
 function startQuiz(setNum) {
   const mod = MODULES[currentModuleId];
   activeQuizSet = setNum;
   quizQuestions = mod.questions.filter(q => q.set === setNum);
+  lastQuizQuestions = JSON.parse(JSON.stringify(quizQuestions));
   quizQIndex = 0;
   quizScore = 0;
   quizTopicScores = new Array(mod.topics.length).fill(0);
+  quizAnswersLog = [];
+  initQuestionState();
+  currentView = 'quiz';
+  render();
+}
+
+function retrySameQuiz() {
+  quizQuestions = JSON.parse(JSON.stringify(lastQuizQuestions));
+  quizQIndex = 0;
+  quizScore = 0;
+  quizTopicScores = new Array(MODULES[currentModuleId].topics.length).fill(0);
   quizAnswersLog = [];
   initQuestionState();
   currentView = 'quiz';
@@ -1484,12 +1751,34 @@ function initQuestionState() {
   quizSelection = null;
   const q = quizQuestions[quizQIndex];
   if (!q) return;
+
   if (q.type === 'bin_sort') {
-    quizBinsState = { items: q.items.map((it, idx) => ({ id: idx, text: it.text, bin: null })), selectedItem: null };
+    quizBinsState = {
+      items: shuffleArray(q.items.map((it, idx) => ({ id: idx, text: it.text, bin: null }))),
+      selectedItem: null
+    };
   } else if (q.type === 'order') {
-    quizOrderState = q.items.map((it, idx) => ({ id: idx, text: it }));
+    let list = q.items.map((it, idx) => ({ id: idx, text: it }));
+    if (list.length > 1) {
+      for (let att = 0; att < 15; att++) {
+        list = shuffleArray([...list]);
+        if (!list.every((it, idx) => it.id === q.correctOrder[idx])) break;
+      }
+    }
+    quizOrderState = list;
   } else if (q.type === 'match') {
-    quizMatchState = { selectedLeft: null, pairs: {} };
+    let rightItems = q.pairs.map((p, idx) => ({ origIdx: idx, text: p.right }));
+    if (rightItems.length > 1) {
+      for (let att = 0; att < 15; att++) {
+        rightItems = shuffleArray([...rightItems]);
+        if (!rightItems.every((it, idx) => it.origIdx === idx)) break;
+      }
+    }
+    quizMatchState = {
+      selectedLeft: null,
+      pairs: {},
+      rightItems: rightItems
+    };
   } else if (q.type === 'multichoice') {
     quizSelection = [];
   }
@@ -1562,7 +1851,7 @@ function renderQuiz(root) {
   // 3. Bin sort
   else if (q.type === 'bin_sort') {
     const unassigned = quizBinsState.items.filter(it => it.bin === null);
-    interactHtml += '<div style="font-size:13px; font-weight:700; color:var(--brand); margin-bottom:6px;">Wybierz element, a potem właściwą szufladę:</div>';
+    interactHtml += '<div style="font-size:13px; font-weight:700; color:var(--brand); margin-bottom:6px;">Dotknij element, a potem właściwą szufladę:</div>';
     interactHtml += '<div class="items-pool">';
     if (unassigned.length === 0) {
       interactHtml += '<span style="color:var(--muted); font-size:13px;">Wszystkie elementy zostały przyporządkowane!</span>';
@@ -1606,14 +1895,14 @@ function renderQuiz(root) {
     quizOrderState.forEach((item, pos) => {
       interactHtml += \`
         <div class="order-row">
-          <div style="display:flex; align-items:center; gap:12px;">
-            <div style="background:var(--brand); color:#fff; width:28px; height:28px; border-radius:50%; display:grid; place-items:center; font-weight:800; font-size:13px;">\${pos+1}</div>
-            <div style="font-weight:600; font-size:15px;">\${item.text}</div>
+          <div style="display:flex; align-items:center; gap:12px; flex:1;">
+            <div style="background:var(--brand); color:#fff; width:28px; height:28px; border-radius:50%; display:grid; place-items:center; font-weight:800; font-size:13px; flex-shrink:0;">\${pos+1}</div>
+            <div style="font-weight:600; font-size:14px; line-height:1.4;">\${item.text}</div>
           </div>
           \${!answered ? \`
-            <div class="order-controls">
-              <button class="small" \${pos === 0 ? 'disabled' : ''} onclick="moveOrderItem(\${pos}, -1)">▲</button>
-              <button class="small" \${pos === quizOrderState.length - 1 ? 'disabled' : ''} onclick="moveOrderItem(\${pos}, 1)">▼</button>
+            <div class="order-controls" style="display:flex; gap:6px;">
+              <button class="small" style="min-width:38px; min-height:38px; font-size:16px; padding:0;" \${pos === 0 ? 'disabled' : ''} onclick="moveOrderItem(\${pos}, -1)" aria-label="W górę">▲</button>
+              <button class="small" style="min-width:38px; min-height:38px; font-size:16px; padding:0;" \${pos === quizOrderState.length - 1 ? 'disabled' : ''} onclick="moveOrderItem(\${pos}, 1)" aria-label="W dół">▼</button>
             </div>
           \` : ''}
         </div>
@@ -1627,31 +1916,58 @@ function renderQuiz(root) {
 
   // 5. Match (Pary)
   else if (q.type === 'match') {
-    const leftPaired = Object.keys(quizMatchState.pairs).map(Number);
-    const rightPaired = Object.values(quizMatchState.pairs);
+    const leftPairedKeys = Object.keys(quizMatchState.pairs).map(Number);
+    const rightPairedVals = Object.values(quizMatchState.pairs);
 
-    interactHtml += '<div style="font-size:13px; font-weight:700; color:var(--brand); margin-bottom:8px;">Kliknij element po lewej, a potem pasujący po prawej:</div>';
+    interactHtml += '<div style="font-size:13px; font-weight:700; color:var(--brand); margin-bottom:8px;">Dotknij element po lewej stronie, a potem pasujący po prawej:</div>';
     interactHtml += '<div class="match-grid">';
     
     // Lewa kolumna
     interactHtml += '<div class="match-col">';
     q.pairs.forEach((p, idx) => {
-      const isPaired = leftPaired.includes(idx);
-      const isSel = quizMatchState.selectedLeft === idx;
+      const isPaired = leftPairedKeys.includes(idx);
+      const isSel = (quizMatchState.selectedLeft === idx);
       let cls = 'match-btn opt-btn';
       if (isPaired) cls += ' paired';
       if (isSel) cls += ' selected';
-      interactHtml += \`<button class="\${cls}" \${answered ? 'disabled' : ''} onclick="pickMatchLeft(\${idx})">\${p.left}</button>\`;
+
+      let badge = '';
+      if (isPaired) {
+        const pairNum = leftPairedKeys.indexOf(idx) + 1;
+        badge = \`<span class="pair-tag">Para \${pairNum}</span>\`;
+      }
+
+      interactHtml += \`
+        <button class="\${cls}" \${answered ? 'disabled' : ''} onclick="pickMatchLeft(\${idx})">
+          <span style="flex:1;">\${p.left}</span>
+          \${badge}
+        </button>
+      \`;
     });
     interactHtml += '</div>';
 
-    // Prawa kolumna (losowa lub stała wg definicji)
+    // Prawa kolumna (przetasowana)
     interactHtml += '<div class="match-col">';
-    q.pairs.forEach((p, idx) => {
-      const isPaired = rightPaired.includes(idx);
+    quizMatchState.rightItems.forEach((rItem) => {
+      const isPaired = rightPairedVals.includes(rItem.origIdx);
       let cls = 'match-btn opt-btn';
       if (isPaired) cls += ' paired';
-      interactHtml += \`<button class="\${cls}" \${answered ? 'disabled' : ''} onclick="pickMatchRight(\${idx})">\${p.right}</button>\`;
+
+      let badge = '';
+      if (isPaired) {
+        const leftIdx = Object.keys(quizMatchState.pairs).find(k => quizMatchState.pairs[k] === rItem.origIdx);
+        if (leftIdx !== undefined) {
+          const pairNum = leftPairedKeys.indexOf(Number(leftIdx)) + 1;
+          badge = \`<span class="pair-tag">Para \${pairNum}</span>\`;
+        }
+      }
+
+      interactHtml += \`
+        <button class="\${cls}" \${answered ? 'disabled' : ''} onclick="pickMatchRight(\${rItem.origIdx})">
+          <span style="flex:1;">\${rItem.text}</span>
+          \${badge}
+        </button>
+      \`;
     });
     interactHtml += '</div>';
 
@@ -1660,15 +1976,15 @@ function renderQuiz(root) {
     if (!answered) {
       const allPaired = Object.keys(quizMatchState.pairs).length === q.pairs.length;
       interactHtml += \`
-        <div style="display:flex; gap:10px; margin-top:16px;">
+        <div style="display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;">
           <button class="primary" \${!allPaired ? 'disabled' : ''} onclick="submitMatch()">Sprawdź odpowiedź</button>
-          \${Object.keys(quizMatchState.pairs).length > 0 ? \`<button class="small outline" onclick="resetPairs()">Wyczyść pary</button>\` : ''}
+          \${Object.keys(quizMatchState.pairs).length > 0 ? \`<button class="small outline" onclick="resetPairs()">Wyczyść połączenia</button>\` : ''}
         </div>
       \`;
     }
   }
 
-  // 6. Hotspot (Klikalna ilustracja SVG)
+  // 6. Hotspot
   else if (q.type === 'hotspot') {
     interactHtml += \`
       <div class="hotspot-svg-wrap">
@@ -1719,7 +2035,7 @@ function renderQuiz(root) {
     <div class="top-bar-quiz">
       <button class="small" onclick="quitQuiz()">✕ Zakończ test</button>
       <span class="status-pill status-active">
-        \${mod.numStr} • Zestaw \${activeQuizSet} z \${mod.maxSets} • Zadanie \${quizQIndex + 1} / \${quizQuestions.length}
+        \${mod.numStr} • \${typeof activeQuizSet === 'number' ? 'Zestaw ' + activeQuizSet + ' z ' + mod.maxSets : 'Losowy test'} • Zadanie \${quizQIndex + 1} / \${quizQuestions.length}
       </span>
     </div>
 
@@ -1744,7 +2060,7 @@ function renderQuiz(root) {
         \${q.type === 'choice' ? 'Wybierz jedną odpowiedź:' : ''}
         \${q.type === 'multichoice' ? 'Wybierz poprawne odpowiedzi:' : ''}
         \${q.type === 'bin_sort' ? 'Dopasuj do odpowiednich grup:' : ''}
-        \${q.type === 'order' ? 'Ułóż w kolejności:' : ''}
+        \${q.type === 'order' ? 'Ułóż w kolejności za pomocą strzałek ▲ i ▼:' : ''}
         \${q.type === 'match' ? 'Połącz w pary:' : ''}
         \${q.type === 'hotspot' ? 'Wskaż właściwy punkt na rysunku:' : ''}
       </div>
@@ -1837,13 +2153,21 @@ function submitOrder() {
 
 function pickMatchLeft(idx) {
   if (quizAnswersLog[quizQIndex] !== undefined) return;
+  if (quizMatchState.pairs[idx] !== undefined) {
+    delete quizMatchState.pairs[idx];
+  }
   quizMatchState.selectedLeft = idx;
   render();
 }
-function pickMatchRight(idx) {
+function pickMatchRight(origIdx) {
   if (quizAnswersLog[quizQIndex] !== undefined) return;
   if (quizMatchState.selectedLeft === null) return;
-  quizMatchState.pairs[quizMatchState.selectedLeft] = idx;
+  for (const k in quizMatchState.pairs) {
+    if (quizMatchState.pairs[k] === origIdx) {
+      delete quizMatchState.pairs[k];
+    }
+  }
+  quizMatchState.pairs[quizMatchState.selectedLeft] = origIdx;
   quizMatchState.selectedLeft = null;
   render();
 }
@@ -1908,10 +2232,15 @@ function finishQuiz() {
   const total = quizQuestions.length;
   const pct = Math.round((quizScore / total) * 100);
 
-  if (!state.usedSets[currentModuleId]) state.usedSets[currentModuleId] = [];
-  if (!state.usedSets[currentModuleId].includes(activeQuizSet)) {
-    state.usedSets[currentModuleId].push(activeQuizSet);
+  if (typeof activeQuizSet === 'number') {
+    if (!state.usedSets[currentModuleId]) state.usedSets[currentModuleId] = [];
+    if (!state.usedSets[currentModuleId].includes(activeQuizSet)) {
+      state.usedSets[currentModuleId].push(activeQuizSet);
+    }
   }
+  if (!state.testsCount) state.testsCount = 0;
+  state.testsCount++;
+
   state.history.push({
     date: new Date().toLocaleDateString('pl-PL'),
     moduleId: currentModuleId,
@@ -1967,7 +2296,7 @@ function renderResults(root) {
         <p>Warto zajrzeć do trybu Nauka i powtórzyć poniższe tematy:</p>
         <div style="display:flex; flex-direction:column; gap:8px;">
           \${weakestIdxs.map(idx => \`
-            <button class="small" onclick="openLearnTopic(\${idx})">
+            <button class="small" onclick="openLearnTopic(\${idx}, 0)">
               📖 Przejdź do: \${mod.topics[idx].title} (s. \${mod.topics[idx].pages}) →
             </button>
           \`).join('')}
@@ -1978,14 +2307,14 @@ function renderResults(root) {
     recHtml = \`
       <div style="background:var(--green-soft); border:1px solid #c8e6c9; border-radius:14px; padding:16px; margin-top:18px;">
         <h4 style="margin:0 0 4px; color:var(--green);">🌟 Bezbłędny test we wszystkich tematach!</h4>
-        <p style="margin:0; font-size:13px;">Wspaniale opanowałeś materiał z: \${mod.title}. Możesz rozwiązać kolejny zestaw z nowymi pytaniami lub odpocząć!</p>
+        <p style="margin:0; font-size:13px;">Wspaniale opanowałeś materiał z: \${mod.title}. Możesz rozwiązać kolejny losowy test z nowymi pytaniami lub odpocząć!</p>
       </div>
     \`;
   }
 
   root.innerHTML = \`
     <div class="panel" style="text-align:center;">
-      <span class="status-pill status-active">\${mod.title} • Zestaw \${activeQuizSet} z \${mod.maxSets} ukończony</span>
+      <span class="status-pill status-active">\${mod.title} • \${typeof activeQuizSet === 'number' ? 'Zestaw ' + activeQuizSet + ' z ' + mod.maxSets : activeQuizSet} ukończony</span>
       <h2 style="font-size:26px; margin:10px 0 4px;">\${badgeTitle}</h2>
       <p style="color:var(--muted); font-size:14px; margin:0;">Twój wynik z \${total} zadań sprawdzianowych:</p>
 
@@ -2027,7 +2356,8 @@ function renderResults(root) {
       \${recHtml}
 
       <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:24px; padding-top:18px; border-top:1px solid var(--line);">
-        <button class="primary" onclick="startQuizAuto('\${currentModuleId}')">🚀 Rozwiąż kolejny test (inny zestaw pytań)</button>
+        <button class="primary" onclick="retrySameQuiz()">🔄 Popraw ten sam test (powtórz te \${total} zadań)</button>
+        <button class="accent" onclick="startRandomQuiz('\${currentModuleId}')">🎲 Nowy losowy test (inne pytania)</button>
         <button onclick="openLearnList('\${currentModuleId}')">📖 Przejdź do Nauki</button>
         <button class="outline" onclick="shareApp()">📲 Udostępnij test rodzicom</button>
         <button class="outline" onclick="currentView='hub'; render();">🏠 Ekran główny</button>
