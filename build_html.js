@@ -1028,7 +1028,8 @@ function loadPlayerProfile() {
 
 let playerProfile = loadPlayerProfile();
 let selectedModalAvatar = playerProfile.avatar || '🦉';
-let rankingEndpoint = localStorage.getItem('odkrywam_ranking_url') || '';
+const DEFAULT_RANKING_URL = ''; // Wklej tutaj wygenerowany URL Web App Google Sheets
+let rankingEndpoint = localStorage.getItem('odkrywam_ranking_url') || DEFAULT_RANKING_URL || '';
 let rankingFilter = 'all';
 let rankingLoading = false;
 let leaderboardList = [];
