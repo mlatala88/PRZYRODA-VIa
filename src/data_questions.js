@@ -216,6 +216,7 @@ module.exports = [
   {
     id: 'z1_t6_1', set: 1, topic: 5, skill: 'P03', type: 'choice',
     q: 'Drzewo w parku ma białą korę z czarnymi spękaniami na dole pnia i wiotkie gałązki. Jakie to drzewo?',
+    img: 'assets/img/drzewo_brzoza.jpg',
     opts: [
       'Lipa drobnolistna',
       'Brzoza brodawkowata',
@@ -229,6 +230,7 @@ module.exports = [
   {
     id: 'z1_t6_2', set: 1, topic: 5, skill: 'P04', type: 'choice',
     q: 'Ptak wielkości gołębia ma popielatoszary tułów, a głowę, skrzydła i ogon całkowicie czarne. Który to ptak?',
+    img: 'assets/img/ptak_wrona.jpg',
     opts: [
       'Gawron',
       'Sroka',
@@ -350,6 +352,7 @@ module.exports = [
   {
     id: 'z2_t3_2', set: 2, topic: 2, skill: 'S04', type: 'choice',
     q: 'Skała jest zwięzła, brunatna, a po dodaniu wody staje się plastyczna i można z niej lepić garnki. Jaka to skała?',
+    img: 'assets/img/skala_glina.jpg',
     opts: [
       'Piasek',
       'Granit',
@@ -459,6 +462,7 @@ module.exports = [
   {
     id: 'z2_t6_1', set: 2, topic: 5, skill: 'P03', type: 'choice',
     q: 'Liście tego drzewa są wyraźnie sercowate i asymetryczne u nasady, a przy owocach znajduje się podłużne skrzydełko. Co to za drzewo?',
+    img: 'assets/img/drzewo_lipa.jpg',
     opts: [
       'Brzoza brodawkowata',
       'Lipa drobnolistna',
@@ -472,6 +476,7 @@ module.exports = [
   {
     id: 'z2_t6_2', set: 2, topic: 5, skill: 'P04', type: 'choice',
     q: 'Ptak jest mniejszy od wrony, ma ciemnoszary tułów, popielatą szyję i charakterystyczne jasne, białawe oko. Który to ptak?',
+    img: 'assets/img/ptak_kawka.jpg',
     opts: [
       'Kawka',
       'Sroka',
@@ -485,6 +490,7 @@ module.exports = [
   {
     id: 'z2_t6_3', set: 2, topic: 5, skill: 'P05', type: 'choice',
     q: 'Który owad ma spłaszczone brunatne ciało i charakterystyczne cęgi (szczypce) na końcu odwłoka, którymi broni się przed wrogami?',
+    img: 'assets/img/owad_skorek.jpg',
     opts: [
       'Biedronka siedmiokropka',
       'Skorek pospolity (szczypawka)',
@@ -584,6 +590,7 @@ module.exports = [
   {
     id: 'z3_t3_1', set: 3, topic: 2, skill: 'S05', type: 'choice',
     q: 'Skała jest lita, bardzo twarda, a po przyjrzeniu się widać w niej różnokolorowe ziarna: szare, różowawe i czarne błyszczące. Co to za skała?',
+    img: 'assets/img/skala_granit.jpg',
     opts: [
       'Wapień',
       'Granit',
@@ -707,6 +714,7 @@ module.exports = [
   {
     id: 'z3_t6_1', set: 3, topic: 5, skill: 'P03', type: 'choice',
     q: 'Krzew w parku miejskim ma jesienią mnóstwo charakterystycznych, kulistych, śnieżnobiałych owoców. Co to za roślina?',
+    img: 'assets/img/krzew_snieguliczka.jpg',
     opts: [
       'Róża dzika',
       'Śnieguliczka biała',
@@ -720,6 +728,7 @@ module.exports = [
   {
     id: 'z3_t6_2', set: 3, topic: 5, skill: 'P04', type: 'choice',
     q: 'Ptak ma bardzo długi, schodkowaty ogon o zielonkawym połysku oraz kontrastowe, czarno-białe upierzenie. Który to ptak?',
+    img: 'assets/img/ptak_sroka.jpg',
     opts: [
       'Sroka',
       'Gawron',
@@ -733,6 +742,7 @@ module.exports = [
   {
     id: 'z3_t6_3', set: 3, topic: 5, skill: 'P05', type: 'choice',
     q: 'Motyl dzienny o ceglastoczerwonych skrzydłach z żółtymi i czarnymi plamami oraz rzędem błękitnych plamek przy krawędzi to:',
+    img: 'assets/img/owad_rusalka.jpg',
     opts: [
       'Rusałka pokrzywnik',
       'Bielinek kapustnik',
@@ -846,6 +856,7 @@ module.exports = [
   {
     id: 'z4_t3_2', set: 4, topic: 2, skill: 'S06', type: 'choice',
     q: 'Z której skały produkuje się kredę do pisania po tablicy oraz wapno budowlane?',
+    img: 'assets/img/skala_wapien.jpg',
     opts: [
       'Z węgla kamiennego',
       'Z wapienia',
@@ -957,6 +968,7 @@ module.exports = [
   {
     id: 'z4_t6_1', set: 4, topic: 5, skill: 'P03', type: 'choice',
     q: 'Roślina łąkowa ma charakterystyczne liście złożone z trzech mniejszych listków z jasnym łukowatym paskiem oraz białe kuliste kwiatostany. Co to za roślina?',
+    img: 'assets/img/roslina_koniczyna.jpg',
     opts: [
       'Babka lancetowata',
       'Koniczyna biała',
@@ -970,6 +982,7 @@ module.exports = [
   {
     id: 'z4_t6_2', set: 4, topic: 5, skill: 'P04', type: 'choice',
     q: 'Ptak jest cały czarny z metalicznym połyskiem, a u dorosłych osobników nasada masywnego dzioba jest jasna i pozbawiona piór. Jaki to ptak?',
+    img: 'assets/img/ptak_gawron.jpg',
     opts: [
       'Kos (samiec)',
       'Gawron',
@@ -1206,6 +1219,7 @@ module.exports = [
   {
     id: 'z5_t6_1', set: 5, topic: 5, skill: 'P03', type: 'choice',
     q: 'Roślina zielna ma liście o podłużnym, lancetowatym kształcie z wyraźnymi nerwami, zebrane w rozetę przy ziemi, oraz wąski kłos. Co to za roślina?',
+    img: 'assets/img/roslina_babka.jpg',
     opts: [
       'Lipa drobnolistna',
       'Babka lancetowata',
@@ -1219,6 +1233,7 @@ module.exports = [
   {
     id: 'z5_t6_2', set: 5, topic: 5, skill: 'P04', type: 'choice',
     q: 'Ptak wielkości drozda ma smoliście czarne upierzenie, a jego dziób i obwódka wokół oka są jaskrawożółte. Co to za ptak?',
+    img: 'assets/img/ptak_kos.jpg',
     opts: [
       'Samiec kosa',
       'Wrona siwa',
@@ -1232,6 +1247,7 @@ module.exports = [
   {
     id: 'z5_t6_3', set: 5, topic: 5, skill: 'P05', type: 'choice',
     q: 'Ile czarnych kropek ma na swoich czerwonych pokrywach skrzydeł nasza rodzima biedronka siedmiokropka?',
+    img: 'assets/img/owad_biedronka.jpg',
     opts: [
       'Zawsze losową liczbę od 2 do 20',
       'Dokładnie 7 kropek (po 3 na każdej pokrywie i 1 wspólna u góry)',
@@ -1453,6 +1469,7 @@ module.exports = [
   {
     id: 'z6_t6_1', set: 6, topic: 5, skill: 'P03', type: 'choice',
     q: 'Krzew ma gałązki pokryte kolcami, bladoróżowe kwiaty wiosną i ciemnoczerwone owoce bogate w witaminę C jesienią. Co to za roślina?',
+    img: 'assets/img/krzew_roza.jpg',
     opts: [
       'Lipa drobnolistna',
       'Róża dzika',
@@ -1466,6 +1483,7 @@ module.exports = [
   {
     id: 'z6_t6_2', set: 6, topic: 5, skill: 'P04', type: 'choice',
     q: 'Ptak ma ciemne pióra mieniące się metalicznie na zielono i fioletowo, gęsto nakrapiane jasnymi perełkami, oraz krótki ogon. Jaki to ptak?',
+    img: 'assets/img/ptak_szpak.jpg',
     opts: [
       'Szpak',
       'Kos',

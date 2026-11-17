@@ -529,9 +529,230 @@ button.outline {
   margin-top: 10px;
   font-size: 14px;
 }
+
+/* KARTY ZE ZDJĘCIAMI W TRYBIE NAUKA */
+.learn-card {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column;
+}
+.card-img-wrap {
+  position: relative;
+  width: 100%;
+  height: 150px;
+  background: #eef2eb;
+  overflow: hidden;
+  cursor: pointer;
+}
+.card-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.25s ease;
+}
+.card-img-wrap:hover .card-thumb {
+  transform: scale(1.05);
+}
+.zoom-badge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(23, 61, 52, 0.82);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 10px;
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+}
+
+/* GŁÓWNE ZDJĘCIE W TEMACIE */
+.learn-hero-img-wrap {
+  margin: 14px 0 18px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+  cursor: pointer;
+  text-align: center;
+}
+.learn-hero-img {
+  max-width: 100%;
+  max-height: 320px;
+  display: block;
+  margin: 0 auto;
+  object-fit: contain;
+}
+.learn-img-caption {
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--brand);
+  background: #f7faf5;
+  border-top: 1px solid var(--line);
+}
+
+/* ZDJĘCIE W PYTANIU QUIZOWYM */
+.quiz-img-container {
+  margin: 10px auto 14px;
+  max-width: 440px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  cursor: pointer;
+  text-align: center;
+}
+.quiz-question-img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  display: block;
+}
+.quiz-img-hint {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--brand);
+  background: #f2f7ef;
+  padding: 6px;
+  border-top: 1px solid var(--line);
+}
+
+/* LIGHTBOX (MODAL DO POWIĘKSZANIA ZDJĘĆ) */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 25, 20, 0.88);
+  backdrop-filter: blur(6px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.lightbox-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.lightbox-content {
+  position: relative;
+  max-width: 94vw;
+  max-height: 90vh;
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+  animation: popIn 0.2s ease-out;
+}
+@keyframes popIn {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.lightbox-img {
+  max-width: 100%;
+  max-height: calc(85vh - 65px);
+  object-fit: contain;
+  display: block;
+  background: #111;
+}
+.lightbox-caption {
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--brand);
+  background: #fff;
+  text-align: center;
+}
+.lightbox-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  border: none;
+  font-size: 18px;
+  font-weight: 900;
+  cursor: pointer;
+  z-index: 2;
+}
+.lightbox-close:hover {
+  background: rgba(0,0,0,0.85);
+}
+
+/* POWIADOMIENIE TOAST */
+.app-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(50px);
+  background: var(--brand);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.25s ease;
+  z-index: 10000;
+  white-space: nowrap;
+}
+.app-toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* CANVAS DLA KONFETTI */
+#confettiCanvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* RESPONSYWNOŚĆ MOBILNA */
+@media (max-width: 600px) {
+  .hero-card { padding: 20px 16px; border-radius: 18px; }
+  .panel { padding: 18px 14px; border-radius: 16px; }
+  .card-img-wrap { height: 135px; }
+  .bins-container { grid-template-columns: 1fr; }
+  .options-grid { gap: 8px; }
+  .opt-btn { padding: 14px; font-size: 14px; }
+}
 </style>
 </head>
 <body>
+
+<canvas id="confettiCanvas"></canvas>
+
+<div id="lightboxModal" class="lightbox-overlay" onclick="closeLightbox(event)">
+  <div class="lightbox-content" onclick="event.stopPropagation()">
+    <button class="lightbox-close" onclick="closeLightbox()" aria-label="Zamknij">✕</button>
+    <img id="lightboxImg" src="" alt="Zdjęcie z podręcznika" class="lightbox-img">
+    <div id="lightboxCaption" class="lightbox-caption"></div>
+  </div>
+</div>
+
+<div id="appToast" class="app-toast"></div>
 
 <header class="app-bar">
   <div class="brand-title" onclick="currentView='hub'; render();">
@@ -578,11 +799,10 @@ const MODULES = {
 // MODEL STANU (localStorage)
 // ==========================================
 const STORE_KEY = 'odkrywam_przyrode_v2';
-const LEGACY_KEY = 'tymek_przyroda_v2';
 
 function loadState() {
   try {
-    const raw = localStorage.getItem(STORE_KEY) || localStorage.getItem(LEGACY_KEY);
+    const raw = localStorage.getItem(STORE_KEY);
     if (raw) {
       const p = JSON.parse(raw);
       return {
@@ -654,11 +874,14 @@ function renderHub(root) {
     <div class="hero-card">
       <div style="font-size: 12px; font-weight:800; letter-spacing:1.5px; opacity:0.8; text-transform:uppercase;">Nowa Era • Klasa 4</div>
       <h1>Cześć, Odkrywco! 🌿</h1>
-      <p>Przed Tobą interaktywny podręcznik przyrody dla klasy 4 („Odkrywam przyrodę”, Nowa Era). Wybierz dział, poznawaj wiedzę krok po kroku w trybie <strong>Nauka</strong>, a potem sprawdź się w różnorodnych testach bez pisania na klawiaturze!</p>
+      <p>Przed Tobą interaktywny podręcznik przyrody dla klasy 4 („Odkrywam przyrodę”, Nowa Era). Wybierz dział, poznawaj wiedzę krok po kroku w trybie <strong>Nauka</strong> ze zdjęciami z podręcznika, a potem sprawdź się w quizach powtórkowych!</p>
       <div class="hero-meta">
         <span class="meta-chip">📚 Dział I: \${d1Completed} / \${MODULES.d1.maxSets} zestawów</span>
         <span class="meta-chip">📚 Dział II: \${d2Completed} / \${MODULES.d2.maxSets} zestawów</span>
         <span class="meta-chip">🏆 Rozwiązane testy: \${totalCompleted}</span>
+      </div>
+      <div style="margin-top:16px;">
+        <button class="small outline" style="color:#fff; border-color:rgba(255,255,255,0.45); background:rgba(255,255,255,0.12);" onclick="shareApp()">📲 Udostępnij test rodzicom / Kopiuj link</button>
       </div>
     </div>
 
@@ -812,6 +1035,15 @@ function renderLearnStep(root) {
   const totalSteps = topic.steps.length;
 
   let bodyHtml = '';
+
+  if (step.img) {
+    bodyHtml += \`
+      <div class="learn-hero-img-wrap" onclick="openLightbox(this.querySelector('img').src, this.querySelector('img').alt)">
+        <img src="\${step.img}" alt="\${step.imgCaption || step.title}" loading="lazy" class="learn-hero-img">
+        <div class="learn-img-caption">🔍 Stuknij zdjęcie, aby powiększyć • \${step.imgCaption || step.title}</div>
+      </div>
+    \`;
+  }
 
   if (step.text) {
     bodyHtml += \`<p style="font-size:16px; margin-bottom:14px;">\${step.text}</p>\`;
@@ -995,12 +1227,20 @@ function renderLearnStep(root) {
     bodyHtml += '</div>';
   }
   if (step.insects) {
-    bodyHtml += '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px; margin:14px 0;">';
+    bodyHtml += '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px; margin:14px 0;">';
     step.insects.forEach(ins => {
       bodyHtml += \`
-        <div style="background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px;">
-          <strong style="color:var(--brand); font-size:16px; display:block; margin-bottom:4px;">🦗 \${ins.name}</strong>
-          <div style="font-size:13px;">\${ins.desc}</div>
+        <div class="learn-card insect-card">
+          \${ins.img ? \`
+            <div class="card-img-wrap" onclick="openLightbox(this.querySelector('img').src, this.querySelector('img').alt)">
+              <img src="\${ins.img}" alt="\${ins.name}" loading="lazy" class="card-thumb">
+              <span class="zoom-badge">🔍 Powiększ</span>
+            </div>
+          \` : ''}
+          <div style="padding:14px;">
+            <strong style="color:var(--brand); font-size:16px; display:block; margin-bottom:4px;">🦗 \${ins.name}</strong>
+            <div style="font-size:13px; line-height:1.45;">\${ins.desc}</div>
+          </div>
         </div>
       \`;
     });
@@ -1061,45 +1301,69 @@ function renderLearnStep(root) {
     bodyHtml += '</div>';
   }
   if (step.rockCards) {
-    bodyHtml += '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px; margin:14px 0;">';
+    bodyHtml += '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px; margin:14px 0;">';
     step.rockCards.forEach(rc => {
       bodyHtml += \`
-        <div style="background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px;">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <strong style="font-size:16px;">\${rc.name}</strong>
-            <span class="status-pill status-active" style="font-size:11px;">\${rc.type}</span>
+        <div class="learn-card rock-card">
+          \${rc.img ? \`
+            <div class="card-img-wrap" onclick="openLightbox(this.querySelector('img').src, this.querySelector('img').alt)">
+              <img src="\${rc.img}" alt="\${rc.name} (\${rc.type})" loading="lazy" class="card-thumb">
+              <span class="zoom-badge">🔍 Powiększ</span>
+            </div>
+          \` : ''}
+          <div style="padding:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <strong style="font-size:16px; color:var(--brand);">\${rc.name}</strong>
+              <span class="status-pill status-active" style="font-size:11px;">\${rc.type}</span>
+            </div>
+            <div style="font-size:12px; color:var(--muted); margin:4px 0;">Barwa: \${rc.color}</div>
+            <div style="font-size:13px; margin:6px 0; line-height:1.4;">\${rc.feat}</div>
+            <div style="font-size:12px; background:#f4f7f2; padding:6px 8px; border-radius:6px; margin-top:6px;"><strong>Zastosowanie:</strong> \${rc.use}</div>
           </div>
-          <div style="font-size:12px; color:var(--muted); margin:4px 0;">Barwa: \${rc.color}</div>
-          <div style="font-size:13px; margin:6px 0;">\${rc.feat}</div>
-          <div style="font-size:12px; background:#f4f7f2; padding:6px 8px; border-radius:6px; margin-top:6px;"><strong>Zastosowanie:</strong> \${rc.use}</div>
         </div>
       \`;
     });
     bodyHtml += '</div>';
   }
   if (step.plants) {
-    bodyHtml += '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px; margin:14px 0;">';
+    bodyHtml += '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px; margin:14px 0;">';
     step.plants.forEach(p => {
       bodyHtml += \`
-        <div style="background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px;">
-          <strong style="font-size:16px; color:var(--brand); display:block; margin-bottom:4px;">🌿 \${p.name}</strong>
-          \${p.leaf ? '<div style="font-size:13px; margin-bottom:4px;"><strong>Liść:</strong> ' + p.leaf + '</div>' : ''}
-          \${p.bark ? '<div style="font-size:13px; margin-bottom:4px;"><strong>Kora:</strong> ' + p.bark + '</div>' : ''}
-          \${p.fruit ? '<div style="font-size:13px; margin-bottom:4px;"><strong>Owoce:</strong> ' + p.fruit + '</div>' : ''}
-          \${p.flower ? '<div style="font-size:13px; margin-bottom:4px;"><strong>Kwiaty:</strong> ' + p.flower + '</div>' : ''}
-          \${p.desc ? '<div style="font-size:12px; color:var(--muted);">' + p.desc + '</div>' : ''}
+        <div class="learn-card plant-card">
+          \${p.img ? \`
+            <div class="card-img-wrap" onclick="openLightbox(this.querySelector('img').src, this.querySelector('img').alt)">
+              <img src="\${p.img}" alt="\${p.name}" loading="lazy" class="card-thumb">
+              <span class="zoom-badge">🔍 Powiększ</span>
+            </div>
+          \` : ''}
+          <div style="padding:14px;">
+            <strong style="font-size:16px; color:var(--brand); display:block; margin-bottom:4px;">🌿 \${p.name}</strong>
+            \${p.leaf ? '<div style="font-size:13px; margin-bottom:4px;"><strong>Liść:</strong> ' + p.leaf + '</div>' : ''}
+            \${p.bark ? '<div style="font-size:13px; margin-bottom:4px;"><strong>Kora:</strong> ' + p.bark + '</div>' : ''}
+            \${p.fruit ? '<div style="font-size:13px; margin-bottom:4px;"><strong>Owoce:</strong> ' + p.fruit + '</div>' : ''}
+            \${p.flower ? '<div style="font-size:13px; margin-bottom:4px;"><strong>Kwiaty:</strong> ' + p.flower + '</div>' : ''}
+            \${p.desc ? '<div style="font-size:12px; color:var(--muted);">' + p.desc + '</div>' : ''}
+          </div>
         </div>
       \`;
     });
     bodyHtml += '</div>';
   }
   if (step.birds) {
-    bodyHtml += '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px; margin:14px 0;">';
+    bodyHtml += '<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px; margin:14px 0;">';
     step.birds.forEach(b => {
       bodyHtml += \`
-        <div style="background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px;">
-          <strong style="font-size:16px; color:var(--brand); display:block; margin-bottom:4px;">🪶 \${b.name}</strong>
-          <div style="font-size:13px;">\${b.look}</div>
+        <div class="learn-card bird-card">
+          \${b.img ? \`
+            <div class="card-img-wrap" onclick="openLightbox(this.querySelector('img').src, this.querySelector('img').alt)">
+              <img src="\${b.img}" alt="\${b.name}" loading="lazy" class="card-thumb">
+              <span class="zoom-badge">🔍 Powiększ</span>
+            </div>
+          \` : ''}
+          <div style="padding:14px;">
+            <strong style="font-size:16px; color:var(--brand); display:block; margin-bottom:4px;">🪶 \${b.name}</strong>
+            <div style="font-size:13px; line-height:1.45;">\${b.look}</div>
+          </div>
         </div>
       \`;
     });
@@ -1291,14 +1555,14 @@ function renderQuiz(root) {
     });
     interactHtml += '</div>';
     if (!answered) {
-      interactHtml += \`<div style="margin-top:16px;"><button class="primary" \${(quizSelection||[]).length === 0 ? 'disabled' : ''} onclick="submitMulti()">Zatwierdź wybór</button></div>\`;
+      interactHtml += \`<div style="margin-top:16px;"><button class="primary" \${(quizSelection||[]).length === 0 ? 'disabled' : ''} onclick="submitMulti()">Sprawdź odpowiedź</button></div>\`;
     }
   }
 
   // 3. Bin sort
   else if (q.type === 'bin_sort') {
     const unassigned = quizBinsState.items.filter(it => it.bin === null);
-    interactHtml += '<div style="font-size:13px; font-weight:700; color:var(--brand); margin-bottom:6px;">1. Kliknij element poniżej, a następnie kliknij docelową szufladę:</div>';
+    interactHtml += '<div style="font-size:13px; font-weight:700; color:var(--brand); margin-bottom:6px;">Wybierz element, a potem właściwą szufladę:</div>';
     interactHtml += '<div class="items-pool">';
     if (unassigned.length === 0) {
       interactHtml += '<span style="color:var(--muted); font-size:13px;">Wszystkie elementy zostały przyporządkowane!</span>';
@@ -1317,7 +1581,7 @@ function renderQuiz(root) {
       interactHtml += \`
         <div class="bin-col \${isTargetActive ? 'active-target' : ''}" onclick="assignToBin(\${bIdx})">
           <div class="bin-title">📦 \${bName}</div>
-          \${isTargetActive ? \`<div style="text-align:center; padding:6px; background:var(--lime); color:var(--brand); font-weight:800; font-size:12px; border-radius:8px; margin-bottom:8px; cursor:pointer;">⬇️ Kliknij, by włożyć</div>\` : ''}
+          \${isTargetActive ? \`<div style="text-align:center; padding:6px; background:var(--lime); color:var(--brand); font-weight:800; font-size:12px; border-radius:8px; margin-bottom:8px; cursor:pointer;">+ Włóż tutaj</div>\` : ''}
           <div style="display:flex; flex-direction:column; gap:6px;">
             \${inBin.map(it => \`
               <div class="item-chip" style="font-size:13px; padding:6px 10px; display:flex; justify-content:space-between; align-items:center;">
@@ -1332,7 +1596,7 @@ function renderQuiz(root) {
     interactHtml += '</div>';
 
     if (!answered) {
-      interactHtml += \`<div style="margin-top:16px;"><button class="primary" \${unassigned.length > 0 ? 'disabled' : ''} onclick="submitBinSort()">Sprawdź podział</button></div>\`;
+      interactHtml += \`<div style="margin-top:16px;"><button class="primary" \${unassigned.length > 0 ? 'disabled' : ''} onclick="submitBinSort()">Sprawdź odpowiedź</button></div>\`;
     }
   }
 
@@ -1357,7 +1621,7 @@ function renderQuiz(root) {
     });
     interactHtml += '</div>';
     if (!answered) {
-      interactHtml += \`<div style="margin-top:16px;"><button class="primary" onclick="submitOrder()">Zatwierdź kolejność</button></div>\`;
+      interactHtml += \`<div style="margin-top:16px;"><button class="primary" onclick="submitOrder()">Sprawdź odpowiedź</button></div>\`;
     }
   }
 
@@ -1366,7 +1630,7 @@ function renderQuiz(root) {
     const leftPaired = Object.keys(quizMatchState.pairs).map(Number);
     const rightPaired = Object.values(quizMatchState.pairs);
 
-    interactHtml += '<div style="font-size:13px; font-weight:700; color:var(--brand); margin-bottom:8px;">Kliknij element po lewej stronie, a następnie pasujący element po prawej:</div>';
+    interactHtml += '<div style="font-size:13px; font-weight:700; color:var(--brand); margin-bottom:8px;">Kliknij element po lewej, a potem pasujący po prawej:</div>';
     interactHtml += '<div class="match-grid">';
     
     // Lewa kolumna
@@ -1397,8 +1661,8 @@ function renderQuiz(root) {
       const allPaired = Object.keys(quizMatchState.pairs).length === q.pairs.length;
       interactHtml += \`
         <div style="display:flex; gap:10px; margin-top:16px;">
-          <button class="primary" \${!allPaired ? 'disabled' : ''} onclick="submitMatch()">Sprawdź dopasowanie</button>
-          \${Object.keys(quizMatchState.pairs).length > 0 ? \`<button class="small outline" onclick="resetPairs()">Wyczyść połączenia</button>\` : ''}
+          <button class="primary" \${!allPaired ? 'disabled' : ''} onclick="submitMatch()">Sprawdź odpowiedź</button>
+          \${Object.keys(quizMatchState.pairs).length > 0 ? \`<button class="small outline" onclick="resetPairs()">Wyczyść pary</button>\` : ''}
         </div>
       \`;
     }
@@ -1431,7 +1695,7 @@ function renderQuiz(root) {
       </div>
     \`;
     if (!answered) {
-      interactHtml += \`<div style="text-align:center;"><button class="primary" \${quizSelection === null ? 'disabled' : ''} onclick="submitHotspot()">Potwierdź wybór</button></div>\`;
+      interactHtml += \`<div style="text-align:center;"><button class="primary" \${quizSelection === null ? 'disabled' : ''} onclick="submitHotspot()">Sprawdź odpowiedź</button></div>\`;
     }
   }
 
@@ -1470,13 +1734,19 @@ function renderQuiz(root) {
       </div>
 
       <div class="q-title">\${q.q}</div>
+      \${q.img ? \`
+        <div class="quiz-img-container" onclick="openLightbox(this.querySelector('img').src, this.querySelector('img').alt)">
+          <img src="\${q.img}" class="quiz-question-img" alt="Zdjęcie do zadania" loading="lazy">
+          <div class="quiz-img-hint">🔍 Stuknij zdjęcie, aby powiększyć</div>
+        </div>
+      \` : ''}
       <div class="q-instruction">
-        \${q.type === 'choice' ? 'Wybierz jedną właściwą odpowiedź:' : ''}
-        \${q.type === 'multichoice' ? 'Zaznacz wszystkie poprawne odpowiedzi (wielokrotny wybór):' : ''}
-        \${q.type === 'bin_sort' ? 'Rozdziel elementy klikając na nie, a następnie na koszyk:' : ''}
-        \${q.type === 'order' ? 'Ustaw elementy w odpowiedniej kolejności za pomocą strzałek:' : ''}
-        \${q.type === 'match' ? 'Dobierz pasujące elementy w pary:' : ''}
-        \${q.type === 'hotspot' ? 'Wskaż właściwy punkt na ilustracji poniżej:' : ''}
+        \${q.type === 'choice' ? 'Wybierz jedną odpowiedź:' : ''}
+        \${q.type === 'multichoice' ? 'Wybierz poprawne odpowiedzi:' : ''}
+        \${q.type === 'bin_sort' ? 'Dopasuj do odpowiednich grup:' : ''}
+        \${q.type === 'order' ? 'Ułóż w kolejności:' : ''}
+        \${q.type === 'match' ? 'Połącz w pary:' : ''}
+        \${q.type === 'hotspot' ? 'Wskaż właściwy punkt na rysunku:' : ''}
       </div>
 
       \${interactHtml}
@@ -1759,10 +2029,112 @@ function renderResults(root) {
       <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:24px; padding-top:18px; border-top:1px solid var(--line);">
         <button class="primary" onclick="startQuizAuto('\${currentModuleId}')">🚀 Rozwiąż kolejny test (inny zestaw pytań)</button>
         <button onclick="openLearnList('\${currentModuleId}')">📖 Przejdź do Nauki</button>
+        <button class="outline" onclick="shareApp()">📲 Udostępnij test rodzicom</button>
         <button class="outline" onclick="currentView='hub'; render();">🏠 Ekran główny</button>
       </div>
     </div>
   \`;
+
+  if (pct >= 80) {
+    setTimeout(() => fireConfetti(), 180);
+  }
+}
+
+// ==========================================
+// FUNKCJE POMOCNICZE (LIGHTBOX, UDOSTĘPNIANIE, KONFETTI)
+// ==========================================
+function openLightbox(src, caption) {
+  const modal = document.getElementById('lightboxModal');
+  const img = document.getElementById('lightboxImg');
+  const cap = document.getElementById('lightboxCaption');
+  if (!modal || !img) return;
+  img.src = src;
+  if (cap) cap.textContent = caption || '';
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox(e) {
+  const modal = document.getElementById('lightboxModal');
+  if (!modal) return;
+  modal.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeLightbox();
+});
+
+function shareApp() {
+  const title = 'Odkrywam Przyrodę 4';
+  const text = 'Świetny darmowy quiz i nauka z przyrody dla klasy 4 (Nowa Era). Autentyczne zdjęcia z podręcznika i testy pod telefon!';
+  const url = window.location.href;
+  if (navigator.share) {
+    navigator.share({ title, text, url }).catch(() => {});
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(() => {
+      showToast('📋 Link skopiowany! Możesz wkleić go na grupie rodziców.');
+    }).catch(() => {
+      showToast('Link do quizu: ' + url);
+    });
+  } else {
+    showToast('Link do quizu: ' + url);
+  }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('appToast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('visible');
+  setTimeout(() => t.classList.remove('visible'), 3200);
+}
+
+function fireConfetti() {
+  const canvas = document.getElementById('confettiCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const pieces = [];
+  const colors = ['#2e7d32', '#cbf26c', '#f59e0b', '#3b82f6', '#ec4899', '#10b981', '#ffb703'];
+  for (let i = 0; i < 75; i++) {
+    pieces.push({
+      x: canvas.width / 2,
+      y: canvas.height * 0.35,
+      vx: (Math.random() - 0.5) * 16,
+      vy: (Math.random() - 0.7) * 16,
+      size: Math.random() * 8 + 6,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      rotation: Math.random() * 360,
+      rSpeed: (Math.random() - 0.5) * 10
+    });
+  }
+
+  let frames = 0;
+  function update() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pieces.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.38;
+      p.rotation += p.rSpeed;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate((p.rotation * Math.PI) / 180);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+      ctx.restore();
+    });
+    frames++;
+    if (frames < 130) {
+      requestAnimationFrame(update);
+    } else {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+  requestAnimationFrame(update);
 }
 
 // Inicjalizacja startowa
@@ -1771,5 +2143,6 @@ render();
 </body>
 </html>`;
 
-fs.writeFileSync('C:/Users/mlata/.gemini/antigravity/scratch/nauka-przyroda-tymek/index.html', htmlContent, 'utf-8');
+const outPath = path.join(__dirname, 'index.html');
+fs.writeFileSync(outPath, htmlContent, 'utf-8');
 console.log('Build completed! index.html written successfully.');

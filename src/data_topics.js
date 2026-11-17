@@ -150,7 +150,9 @@ module.exports = [
         title: 'Czym jest skała?',
         badge: 'Definicja książkowa',
         text: '<strong>Skała</strong> to naturalny materiał budujący powierzchnię Ziemi. Każda skała składa się z drobniejszych cząstek — <strong>minerałów</strong>.',
-        subtext: 'Niektóre skały składają się tylko z jednego minerału (np. wapień), a inne z wielu różnych (np. granit).',
+        subtext: 'Niektóre skały składają się tylko z jednego minerału (np. wapień), a inne z wielu różnych (np. granit składa się z kwarcu, skalenia i miki).',
+        img: 'assets/img/granit_mineraly.jpg',
+        imgCaption: 'Granit i budujące go minerały: jasny kwarc, różowy skaleń i czarna mika (s. 64)',
         svgType: 'rock_intro'
       },
       {
@@ -192,11 +194,14 @@ module.exports = [
         title: 'Poznajemy najważniejsze skały',
         badge: 'Karty skał (s. 65–66)',
         rockCards: [
-          { name: 'Piasek', type: 'Luźna', color: 'Żółtawy, jasny', feat: 'Pojedyncze twarde ziarenka, przepuszcza wodę.', use: 'Wyrób szkła, beton, zaprawy murarskie.' },
-          { name: 'Glina', type: 'Zwięzła', color: 'Brunatna, szara', feat: 'Po zmoczeniu staje się plastyczna i nie przepuszcza wody.', use: 'Cegły, dachówki, naczynia ceramiczne.' },
-          { name: 'Granit', type: 'Lita', color: 'Szary lub różowawy', feat: 'Widać różnokolorowe ziarna kwarcu, skalenia i miki! Bardzo twardy.', use: 'Krawężniki, pomniki, blaty, schody.' },
-          { name: 'Wapień', type: 'Lita', color: 'Biały, kremowy, szary', feat: 'Średnio twardy. <strong>Pieni się pod wpływem octu!</strong>', use: 'Kreda do tablicy, produkcja cementu i wapna.' },
-          { name: 'Węgiel kamienny', type: 'Lita', color: 'Czarny z połyskiem', feat: 'Kruchy, pali się jasnym płomieniem dając ciepło.', use: 'Opał, paliwo w elektrowniach.' }
+          { name: 'Piasek', type: 'Luźna', color: 'Żółtawy, jasny', feat: 'Pojedyncze twarde ziarenka, przepuszcza wodę.', use: 'Wyrób szkła, beton, zaprawy murarskie.', img: 'assets/img/skala_piasek.jpg' },
+          { name: 'Żwir', type: 'Luźna', color: 'Różnobarwny', feat: 'Zaokrąglone kamyki powyżej 2 mm, luźno zsypane.', use: 'Podkłady kolejowe i drogowe, produkcja betonu.', img: 'assets/img/skala_zwir.jpg' },
+          { name: 'Glina', type: 'Zwięzła', color: 'Brunatna, rdzawa, szara', feat: 'Po zmoczeniu staje się plastyczna i nie przepuszcza wody.', use: 'Cegły, dachówki, naczynia ceramiczne.', img: 'assets/img/skala_glina.jpg' },
+          { name: 'Less', type: 'Zwięzła', color: 'Żółtawy, pyłowy', feat: 'Drobny pył naniesiony przez wiatr, łatwo kruszy się w palcach.', use: 'Tworzy niezwykle żyzne gleby (czarnoziemy).', img: 'assets/img/skala_less.jpg' },
+          { name: 'Granit', type: 'Lita', color: 'Szary lub różowawy', feat: 'Widać różnokolorowe ziarna kwarcu, skalenia i miki! Bardzo twardy.', use: 'Krawężniki, pomniki, blaty, schody.', img: 'assets/img/skala_granit.jpg' },
+          { name: 'Wapień', type: 'Lita', color: 'Biały, kremowy, szary', feat: 'Średnio twardy. <strong>Pieni się pod wpływem octu!</strong>', use: 'Kreda do tablicy, produkcja cementu i wapna.', img: 'assets/img/skala_wapien.jpg' },
+          { name: 'Piaskowiec', type: 'Lita', color: 'Żółty, beżowy, czerwony', feat: 'Zlepione ziarna piasku spojone lepiszczem mineralnym.', use: 'Kamień budowlany, rzeźby, płytki elewacyjne.', img: 'assets/img/skala_piaskowiec.jpg' },
+          { name: 'Węgiel kamienny', type: 'Lita', color: 'Czarny z połyskiem', feat: 'Kruchy, pali się jasnym płomieniem dając ciepło.', use: 'Opał, paliwo w elektrowniach.', img: 'assets/img/skala_wegiel.jpg' }
         ],
         svgType: 'rock_samples'
       },
@@ -259,6 +264,8 @@ module.exports = [
       {
         title: 'Profil glebowy — zajrzyj pod powierzchnię',
         badge: 'Warstwy gleby (s. 71)',
+        img: 'assets/img/profil_glebowy.jpg',
+        imgCaption: 'Autentyczny profil glebowy z podręcznika: poziomy 1–4',
         layers: [
           { name: '1. Ściółka / poziom wierzchni', desc: 'Opadłe liście, gałązki, szczątki roślin.' },
           { name: '2. Poziom próchniczny (najważniejszy!)', desc: 'Ciemna, żyzna warstwa bogata w próchnicę. Tu rozwijają się korzenie roślin.' },
@@ -350,12 +357,12 @@ module.exports = [
         title: 'Rozpoznajemy 6 lokalnych roślin',
         badge: 'Atlas roślin (s. 82)',
         plants: [
-          { name: 'Lipa drobnolistna', leaf: 'Sercowaty, u nasady niesymetryczny', fruit: 'Małe kuliste orzeszki ze skrzydełkiem (ułatwia lot na wietrze).' },
-          { name: 'Brzoza brodawkowata', leaf: 'Trójkątny lub rombowaty', bark: 'Biała kora łuszcząca się cienkimi płatami, czarne bruzdy w dole.' },
-          { name: 'Śnieguliczka biała', desc: 'Krzew w parkach', fruit: 'Charakterystyczne białe, gąbczaste kulki jesienią (niejadalne!).' },
-          { name: 'Róża dzika', desc: 'Krzew z kolcami', fruit: 'Ciemnoczerwone owoce bogate w witaminę C, liście z kilku listków.' },
-          { name: 'Koniczyna biała', leaf: 'Trójlistkowy z jasnym łukiem', flower: 'Białe kuliste główki na trawnikach i łąkach.' },
-          { name: 'Babka lancetowata', leaf: 'Długie wąskie liście przy ziemi', stem: 'Długa bezlistna łodyga z brunatnym kłosem na szczycie.' }
+          { name: 'Lipa drobnolistna', leaf: 'Sercowaty, u nasady niesymetryczny', fruit: 'Małe kuliste orzeszki ze skrzydełkiem (ułatwia lot na wietrze).', img: 'assets/img/drzewo_lipa.jpg' },
+          { name: 'Brzoza brodawkowata', leaf: 'Trójkątny lub rombowaty', bark: 'Biała kora łuszcząca się cienkimi płatami, czarne bruzdy w dole.', img: 'assets/img/drzewo_brzoza.jpg' },
+          { name: 'Śnieguliczka biała', desc: 'Krzew w parkach', fruit: 'Charakterystyczne białe, gąbczaste kulki jesienią (niejadalne!).', img: 'assets/img/krzew_snieguliczka.jpg' },
+          { name: 'Róża dzika', desc: 'Krzew z kolcami', fruit: 'Ciemnoczerwone owoce bogate w witaminę C, liście z kilku listków.', img: 'assets/img/krzew_roza.jpg' },
+          { name: 'Koniczyna biała', leaf: 'Trójlistkowy z jasnym łukiem', flower: 'Białe kuliste główki na trawnikach i łąkach.', img: 'assets/img/roslina_koniczyna.jpg' },
+          { name: 'Babka lancetowata', leaf: 'Długie wąskie liście przy ziemi', stem: 'Długa bezlistna łodyga z brunatnym kłosem na szczycie.', img: 'assets/img/roslina_babka.jpg' }
         ],
         svgType: 'plants_atlas'
       },
@@ -363,12 +370,12 @@ module.exports = [
         title: 'Rozpoznajemy 6 lokalnych ptaków',
         badge: 'Atlas ptaków (s. 83)',
         birds: [
-          { name: 'Gawron', look: 'Cały czarny z fioletowym połyskiem. U dorosłych jasna, naga skóra u nasady dzioba i pierzaste „nogawice”.' },
-          { name: 'Kawka', look: 'Mniejsza od gawrona, ciemnoszary tułów, jasnoszara szyja i kark, charakterystyczne białe lub jasnoniebieskie oko.' },
-          { name: 'Sroka', look: 'Bardzo długi schodkowaty ogon, kontrastowe czarno-białe upierzenie (biały brzuch i boki, czarny grzbiet i głowa).' },
-          { name: 'Szpak', look: 'Krótki ogon, ciemne pióra nakrapiane jasnymi perełkami/trójkącikami, ostry dziób (wiosną żółty).' },
-          { name: 'Kos (samiec)', look: 'Cały smoliście czarny, z jaskrawożółtym lub pomarańczowym dziobem i żółtą obwódką oka (samica jest brunatna).' },
-          { name: 'Wrona siwa', look: 'Wyraźnie dwubarwna: popielatoszary tułów oraz czarna głowa, gardło, skrzydła i ogon.' }
+          { name: 'Gawron', look: 'Cały czarny z fioletowym połyskiem. U dorosłych jasna, naga skóra u nasady dzioba i pierzaste „nogawice”.', img: 'assets/img/ptak_gawron.jpg' },
+          { name: 'Kawka', look: 'Mniejsza od gawrona, ciemnoszary tułów, jasnoszara szyja i kark, charakterystyczne białe lub jasnoniebieskie oko.', img: 'assets/img/ptak_kawka.jpg' },
+          { name: 'Sroka', look: 'Bardzo długi schodkowaty ogon, kontrastowe czarno-białe upierzenie (biały brzuch i boki, czarny grzbiet i głowa).', img: 'assets/img/ptak_sroka.jpg' },
+          { name: 'Szpak', look: 'Krótki ogon, ciemne pióra nakrapiane jasnymi perełkami/trójkącikami, ostry dziób (wiosną żółty).', img: 'assets/img/ptak_szpak.jpg' },
+          { name: 'Kos (samiec)', look: 'Cały smoliście czarny, z jaskrawożółtym lub pomarańczowym dziobem i żółtą obwódką oka (samica jest brunatna).', img: 'assets/img/ptak_kos.jpg' },
+          { name: 'Wrona siwa', look: 'Wyraźnie dwubarwna: popielatoszary tułów oraz czarna głowa, gardło, skrzydła i ogon.', img: 'assets/img/ptak_wrona.jpg' }
         ],
         svgType: 'birds_atlas'
       },
@@ -376,9 +383,10 @@ module.exports = [
         title: 'Poznajemy owady z naszej okolicy',
         badge: 'Atlas owadów (s. 84)',
         insects: [
-          { name: 'Skorek pospolity (szczypawka)', desc: 'Spłaszczone brunatne ciało ze szczypcami (cęgami) na końcu odwłoka do obrony i składania skrzydeł. Nie gryzie ludzi!' },
-          { name: 'Biedronka siedmiokropka', desc: 'Czerwone pokrywy z dokładnie 7 kropkami (po 3 z każdej strony i 1 u góry przy tarczce). Zjada szkodliwe mszyce.' },
-          { name: 'Rusałka pokrzywnik', desc: 'Ceglastoczerwony motyl dzienny z czarno-żółtymi plamami i rzędem błękitnych plamek na brzegu skrzydeł. Gąsienice żyją na pokrzywach.' }
+          { name: 'Skorek pospolity (szczypawka)', desc: 'Spłaszczone brunatne ciało ze szczypcami (cęgami) na końcu odwłoka do obrony i składania skrzydeł. Nie gryzie ludzi!', img: 'assets/img/owad_skorek.jpg' },
+          { name: 'Biedronka siedmiokropka', desc: 'Czerwone pokrywy z dokładnie 7 kropkami (po 3 z każdej strony i 1 u góry przy tarczce). Zjada szkodliwe mszyce.', img: 'assets/img/owad_biedronka.jpg' },
+          { name: 'Rusałka pokrzywnik', desc: 'Ceglastoczerwony motyl dzienny z czarno-żółtymi plamami i rzędem błękitnych plamek na brzegu skrzydeł. Gąsienice żyją na pokrzywach.', img: 'assets/img/owad_rusalka.jpg' },
+          { name: 'Biedronka azjatycka (arlekina)', desc: 'Gatunek inwazyjny: ma zmienną liczbę kropek (od 0 do 23) i literę M lub W na przedpleczu. Wypiera naszą siedmiokropkę.', img: 'assets/img/owad_biedronka_azjatycka.jpg' }
         ],
         svgType: 'insects_atlas'
       },

@@ -1,6 +1,6 @@
 # Misja: Moja Okolica — Mapa Treści i Architektura Aplikacji
 *Podręcznik Nowa Era „Odkrywam przyrodę 4” — Dział II (s. 53–90)*  
-*Dla: Tymek (klasa 4, ok. 10 lat) | Data: 17 listopada 2026*
+*Dla: Uczniowie klasy 4 (wiek ok. 10 lat) | Data: 17 listopada 2026*
 
 ---
 
@@ -221,7 +221,7 @@ flowchart LR
 
 ## 5. Architektura Banku Zadań i Trybu „Sprawdź Wiedzę”
 
-Aby Tymek mógł podchodzić do testu **3–7 razy bez nudnego powtarzania tych samych pytań**, aplikacja operuje na stałym, zweryfikowanym **banku co najmniej 126 zadań** podzielonym na **7 równorzędnych zestawów** po 18 zadań (po 3 zadania z każdego z 6 tematów).
+Aby dziecko mogło podchodzić do testu **3–7 razy bez nudnego powtarzania tych samych pytań**, aplikacja operuje na stałym, zweryfikowanym **banku co najmniej 126 zadań** podzielonym na **7 równorzędnych zestawów** po 18 zadań (po 3 zadania z każdego z 6 tematów).
 
 ```mermaid
 flowchart TD
