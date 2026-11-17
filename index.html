@@ -572,6 +572,61 @@ button.outline {
 .step-nav-pill.done {
   border-color: var(--green);
 }
+
+/* MODALE DLA PROFILU I RANKINGU */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(18, 48, 38, 0.75);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open {
+  display: flex;
+}
+.modal-card {
+  background: #ffffff;
+  border-radius: 20px;
+  max-width: 440px;
+  width: 100%;
+  padding: 24px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+  animation: popIn 0.2s ease-out;
+}
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+  margin: 12px 0 18px;
+}
+.avatar-btn {
+  width: 38px;
+  height: 38px;
+  font-size: 20px;
+  border-radius: 10px;
+  background: #f4f7f2;
+  border: 2px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+.avatar-btn:hover {
+  background: #e8f5e9;
+  border-color: #a5d6a7;
+}
+.avatar-btn.selected {
+  border-color: var(--brand);
+  background: var(--lime);
+  transform: scale(1.1);
+}
+
 .pair-tag {
   font-size: 11px;
   font-weight: 800;
@@ -807,14 +862,60 @@ button.outline {
 
 <div id="appToast" class="app-toast"></div>
 
+<!-- MODAL PROFILU UCZNIA -->
+<div id="profileModal" class="modal-overlay" onclick="closeProfileModal(event)">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <h3 style="margin:0; font-size:19px; color:var(--brand);">👤 Twój profil Odkrywcy</h3>
+      <button class="small outline" style="padding:4px 10px;" onclick="closeProfileModal()">✕</button>
+    </div>
+    <p style="font-size:13px; color:var(--muted); margin:0 0 14px;">Wybierz imię lub ksywkę oraz zwierzątko, które będzie reprezentować Cię w rankingu klasy!</p>
+    
+    <label style="font-size:13px; font-weight:700; color:var(--brand); display:block; margin-bottom:6px;">Twoje imię lub pseudonim:</label>
+    <input type="text" id="profileNameInput" maxlength="20" placeholder="np. Tomek, Zosia, MłodyWilk" style="width:100%; padding:10px 14px; border:2px solid var(--line); border-radius:12px; font-size:15px; font-weight:600; outline:none; margin-bottom:16px;">
+
+    <label style="font-size:13px; font-weight:700; color:var(--brand); display:block; margin-bottom:6px;">Wybierz swój awatar:</label>
+    <div id="avatarPickerGrid" class="avatar-grid"></div>
+
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:10px;">
+      <button class="primary" style="width:100%;" onclick="saveProfileFromModal()">✓ Zapisz profil</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL USTAWIEŃ BAZY RANKINGU ONLINE -->
+<div id="rankingSettingsModal" class="modal-overlay" onclick="closeRankingSettings(event)">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+      <h3 style="margin:0; font-size:18px; color:var(--brand);">⚙️ Połączenie z bazą klasy</h3>
+      <button class="small outline" style="padding:4px 10px;" onclick="closeRankingSettings()">✕</button>
+    </div>
+    <p style="font-size:13px; color:var(--ink); line-height:1.45; margin-bottom:12px;">
+      Wklej poniżej adres URL darmowego skryptu <strong>Google Apps Script (Web App)</strong> powiązanego z Arkuszem Google Twojej klasy.
+    </p>
+    <div style="background:#f4f7f2; border:1px solid var(--line); padding:10px 14px; border-radius:10px; font-size:12px; color:var(--muted); margin-bottom:14px;">
+      💡 Jeśli pole jest puste, ranking działa <strong>lokalnie na tym urządzeniu</strong> (dla Ciebie, rodzeństwa i rodziców).
+    </div>
+
+    <label style="font-size:13px; font-weight:700; color:var(--brand); display:block; margin-bottom:6px;">Adres Web App Google Sheets:</label>
+    <input type="url" id="rankingEndpointInput" placeholder="https://script.google.com/macros/s/.../exec" style="width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:10px; font-size:13px; margin-bottom:16px;">
+
+    <div style="display:flex; gap:8px; justify-content:flex-end;">
+      <button class="small outline" onclick="clearRankingEndpoint()">Wyczyść (użyj lokalnego)</button>
+      <button class="primary small" onclick="saveRankingEndpoint()">Zapisz i połącz</button>
+    </div>
+  </div>
+</div>
+
+
 <header class="app-bar">
   <div class="brand-title" onclick="currentView='hub'; render();">
     <div class="brand-icon">🌱</div>
     <span>Odkrywam Przyrodę 4</span>
   </div>
   <div style="display:flex; gap:8px; align-items:center;">
-    <button class="small outline" style="color:#fff; border-color:rgba(255,255,255,0.4); font-size:12px; padding:4px 10px; min-height:30px; border-radius:14px; background:rgba(255,255,255,0.12);" onclick="resetAllProgress()">🔄 Nowy uczeń</button>
-    <div id="topMeta" class="nav-pill" onclick="currentView='hub'; render();">Odkrywca 🌿</div>
+    <button class="small outline" style="color:#fff; border-color:rgba(255,255,255,0.45); font-size:12px; padding:4px 10px; min-height:30px; border-radius:14px; background:rgba(255,255,255,0.14);" onclick="openLeaderboardView()">🏆 Ranking</button>
+    <div id="topPlayerPill" class="nav-pill" onclick="openProfileModal()">🦉 Odkrywca</div>
   </div>
 </header>
 
@@ -894,7 +995,7 @@ let state = loadState();
 // ROUTING I ZMIENNE APLIKACJI
 // ==========================================
 let currentModuleId = state.currentModuleId || 'd2';
-let currentView = 'hub'; // 'hub' | 'learn_list' | 'learn_step' | 'learn_topic_done' | 'quiz' | 'results'
+let currentView = 'hub'; // 'hub' | 'learn_list' | 'learn_step' | 'learn_topic_done' | 'quiz' | 'results' | 'ranking'
 let currentTopicIdx = 0;
 let currentStepIdx = 0;
 let activeQuizSet = 1;
@@ -904,6 +1005,213 @@ let quizQIndex = 0;
 let quizScore = 0;
 let quizTopicScores = [];
 let quizAnswersLog = [];
+let lastScoreSubmitted = false;
+
+// PROFILE I RANKING KLASY
+const AVATARS = ['🦉', '🦊', '🐺', '🦅', '🐻', '🐬', '🦁', '🦔', '🐝', '🐿️', '🐯', '🐼', '🦖', '🚀', '⭐', '🍀'];
+
+function loadPlayerProfile() {
+  try {
+    const raw = localStorage.getItem('odkrywam_player_profile');
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return { name: 'Młody Odkrywca', avatar: '🦉' };
+}
+
+let playerProfile = loadPlayerProfile();
+let selectedModalAvatar = playerProfile.avatar || '🦉';
+let rankingEndpoint = localStorage.getItem('odkrywam_ranking_url') || '';
+let rankingFilter = 'all';
+let rankingLoading = false;
+let leaderboardList = [];
+
+function savePlayerProfile(prof) {
+  try {
+    playerProfile = prof;
+    localStorage.setItem('odkrywam_player_profile', JSON.stringify(prof));
+    updateTopPlayerPill();
+  } catch(e) {}
+}
+
+function updateTopPlayerPill() {
+  const el = document.getElementById('topPlayerPill');
+  if (el) {
+    el.textContent = (playerProfile.avatar || '🦉') + ' ' + (playerProfile.name || 'Odkrywca');
+  }
+}
+
+function openProfileModal() {
+  const modal = document.getElementById('profileModal');
+  const input = document.getElementById('profileNameInput');
+  const grid = document.getElementById('avatarPickerGrid');
+  if (!modal || !input || !grid) return;
+
+  input.value = playerProfile.name || '';
+  selectedModalAvatar = playerProfile.avatar || '🦉';
+
+  grid.innerHTML = AVATARS.map(av => `
+    <button type="button" class="avatar-btn ${av === selectedModalAvatar ? 'selected' : ''}" onclick="selectAvatar('${av}')">
+      ${av}
+    </button>
+  `).join('');
+
+  modal.classList.add('open');
+  input.focus();
+}
+
+function closeProfileModal(e) {
+  const modal = document.getElementById('profileModal');
+  if (modal) modal.classList.remove('open');
+}
+
+function selectAvatar(av) {
+  selectedModalAvatar = av;
+  const grid = document.getElementById('avatarPickerGrid');
+  if (!grid) return;
+  const btns = grid.querySelectorAll('.avatar-btn');
+  btns.forEach(b => {
+    if (b.textContent.trim() === av) b.classList.add('selected');
+    else b.classList.remove('selected');
+  });
+}
+
+function saveProfileFromModal() {
+  const input = document.getElementById('profileNameInput');
+  const name = (input ? input.value : '').trim() || 'Odkrywca';
+  savePlayerProfile({ name: name, avatar: selectedModalAvatar });
+  closeProfileModal();
+  showToast('👤 Profil zaktualizowany: ' + selectedModalAvatar + ' ' + name);
+  render();
+}
+
+function openRankingSettings() {
+  const modal = document.getElementById('rankingSettingsModal');
+  const input = document.getElementById('rankingEndpointInput');
+  if (!modal || !input) return;
+  input.value = rankingEndpoint || '';
+  modal.classList.add('open');
+}
+
+function closeRankingSettings(e) {
+  const modal = document.getElementById('rankingSettingsModal');
+  if (modal) modal.classList.remove('open');
+}
+
+function saveRankingEndpoint() {
+  const input = document.getElementById('rankingEndpointInput');
+  rankingEndpoint = (input ? input.value : '').trim();
+  try {
+    localStorage.setItem('odkrywam_ranking_url', rankingEndpoint);
+  } catch(e) {}
+  closeRankingSettings();
+  showToast(rankingEndpoint ? '⚙️ Połączono z bazą klasy!' : 'Przełączono na lokalną bazę.');
+  refreshRanking();
+}
+
+function clearRankingEndpoint() {
+  rankingEndpoint = '';
+  try {
+    localStorage.removeItem('odkrywam_ranking_url');
+  } catch(e) {}
+  closeRankingSettings();
+  showToast('Używasz lokalnej bazy na tym urządzeniu.');
+  refreshRanking();
+}
+
+function loadLocalLeaderboard() {
+  try {
+    const raw = localStorage.getItem('odkrywam_local_leaderboard');
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return [];
+}
+
+function saveToLocalLeaderboard(entry) {
+  const list = loadLocalLeaderboard();
+  list.push(entry);
+  list.sort((a, b) => (b.score - a.score) || ((b.pct || 0) - (a.pct || 0)));
+  try {
+    localStorage.setItem('odkrywam_local_leaderboard', JSON.stringify(list.slice(0, 50)));
+  } catch(e) {}
+}
+
+async function fetchLeaderboard() {
+  if (!rankingEndpoint) {
+    return loadLocalLeaderboard();
+  }
+  try {
+    const res = await fetch(rankingEndpoint + '?action=get');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    return Array.isArray(data) ? data : loadLocalLeaderboard();
+  } catch(e) {
+    console.warn('Leaderboard online fetch failed, using local fallback:', e);
+    return loadLocalLeaderboard();
+  }
+}
+
+async function submitScoreToLeaderboard(entry) {
+  saveToLocalLeaderboard(entry);
+  if (!rankingEndpoint) {
+    return { success: true, localOnly: true };
+  }
+  try {
+    const params = new URLSearchParams({
+      action: 'add',
+      name: entry.name,
+      avatar: entry.avatar,
+      module: entry.module,
+      score: entry.score,
+      total: entry.total,
+      pct: entry.pct,
+      date: entry.date
+    });
+    await fetch(rankingEndpoint + '?' + params.toString(), { method: 'GET', mode: 'no-cors' });
+    return { success: true, localOnly: false };
+  } catch(e) {
+    console.warn('Online score submission failed:', e);
+    return { success: false, error: e.message };
+  }
+}
+
+function openLeaderboardView() {
+  currentView = 'ranking';
+  refreshRanking();
+}
+
+async function refreshRanking() {
+  rankingLoading = true;
+  render();
+  leaderboardList = await fetchLeaderboard();
+  rankingLoading = false;
+  render();
+}
+
+function setRankingFilter(filt) {
+  rankingFilter = filt;
+  render();
+}
+
+async function submitCurrentScore() {
+  const mod = MODULES[currentModuleId];
+  const entry = {
+    name: playerProfile.name || 'Odkrywca',
+    avatar: playerProfile.avatar || '🦉',
+    module: mod.title,
+    moduleId: currentModuleId,
+    score: quizScore,
+    total: quizQuestions.length,
+    pct: Math.round((quizScore / quizQuestions.length) * 100),
+    date: new Date().toLocaleDateString('pl-PL')
+  };
+
+  await submitScoreToLeaderboard(entry);
+  lastScoreSubmitted = true;
+  showToast('🎉 Brawo, ' + entry.name + '! Twój wynik został zapisany w rankingu!');
+  fireConfetti();
+  render();
+}
+
 
 // Stan interakcji pytania
 let quizSelection = null;
@@ -920,6 +1228,7 @@ function render() {
   else if (currentView === 'learn_topic_done') renderLearnTopicDone(root);
   else if (currentView === 'quiz') renderQuiz(root);
   else if (currentView === 'results') renderResults(root);
+  else if (currentView === 'ranking') renderRanking(root);
 }
 
 // ----------------------------------------------------
@@ -941,7 +1250,8 @@ function renderHub(root) {
         <span class="meta-chip">🏆 Rozwiązane testy: ${testsCount}</span>
         <span class="meta-chip">🎲 Zawsze losowe zestawy</span>
       </div>
-      <div style="margin-top:16px;">
+      <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="small" style="color:var(--brand); background:var(--lime); border:none; font-weight:800; padding:8px 14px;" onclick="openLeaderboardView()">🏆 Tabela Rekordów Klasy</button>
         <button class="small outline" style="color:#fff; border-color:rgba(255,255,255,0.45); background:rgba(255,255,255,0.12);" onclick="shareApp()">📲 Udostępnij test rodzicom / Kopiuj link</button>
       </div>
     </div>
@@ -2244,6 +2554,7 @@ function finishQuiz() {
   });
   saveState();
 
+  lastScoreSubmitted = false;
   currentView = 'results';
   render();
 }
@@ -2314,6 +2625,30 @@ function renderResults(root) {
         <div class="results-score-inner">
           <div class="score-num">${quizScore}</div>
           <div class="score-max">z ${total} pkt (${pct}%)</div>
+        </div>
+      </div>
+
+      <!-- KARTA WYSYŁANIA WYNIKU DO RANKINGU KLASY -->
+      <div style="background:#f0f8ef; border:2px solid #a5d6a7; border-radius:18px; padding:18px 16px; margin:22px 0 16px; text-align:center;">
+        <div style="font-size:12px; font-weight:800; color:var(--green); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">🏆 Tablica Rekordów Klasy</div>
+        <h4 style="font-size:18px; margin:0 0 6px; color:var(--brand);">
+          ${lastScoreSubmitted 
+            ? '✅ Twój wynik (' + quizScore + '/' + total + ' pkt) jest w rankingu!' 
+            : 'Zapisz swój wynik (' + quizScore + '/' + total + ' pkt) na tablicy klasy!'}
+        </h4>
+        <p style="font-size:13px; color:var(--muted); margin:0 0 12px;">
+          Grasz jako: <strong style="color:var(--brand); font-size:15px;">${playerProfile.avatar} ${playerProfile.name}</strong>
+          <button type="button" class="small outline" style="margin-left:8px; font-size:11px; padding:2px 8px; min-height:24px; border-radius:8px;" onclick="openProfileModal()">Zmień nick</button>
+        </p>
+        <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+          ${!lastScoreSubmitted ? `
+            <button class="accent" style="padding:10px 18px; font-size:14px; font-weight:800;" onclick="submitCurrentScore()">
+              🚀 Wyślij mój wynik do rankingu
+            </button>
+          ` : ''}
+          <button class="primary" style="padding:10px 18px; font-size:14px;" onclick="openLeaderboardView()">
+            🏆 Zobacz Tabela Rekordów
+          </button>
         </div>
       </div>
 
@@ -2459,7 +2794,109 @@ function fireConfetti() {
   requestAnimationFrame(update);
 }
 
+
+// ----------------------------------------------------
+// 6. EKRAN RANKINGU KLASY (TABELA REKORDÓW)
+// ----------------------------------------------------
+function renderRanking(root) {
+  const filtered = leaderboardList.filter(it => {
+    if (rankingFilter === 'all') return true;
+    if (rankingFilter === 'd1') return it.moduleId === 'd1' || (it.module && it.module.includes('Spotkanie'));
+    if (rankingFilter === 'd2') return it.moduleId === 'd2' || (it.module && it.module.includes('Moja okolica'));
+    return true;
+  });
+
+  const isOnline = Boolean(rankingEndpoint);
+
+  root.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+      <button class="small" onclick="currentView='hub'; render();">← Wróć do ekranu głównego</button>
+      <div style="display:flex; gap:8px;">
+        <button class="small outline" onclick="refreshRanking()">🔄 Odśwież</button>
+        <button class="small outline" style="color:var(--muted);" onclick="openRankingSettings()">⚙️ Baza klasy</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div style="text-align:center; margin-bottom:18px;">
+        <div style="font-size:46px; margin-bottom:4px;">🏆</div>
+        <h2 style="font-size:24px; margin:0 0 6px; color:var(--brand);">Tabela Rekordów Klasy</h2>
+        <p style="color:var(--muted); font-size:13px; margin:0 auto; max-width:480px;">
+          Najwyższe wyniki uczniów z testów powtórkowych z przyrody. Kto zdobędzie tytuł Mistrza Przyrody?
+        </p>
+        <div style="margin-top:8px;">
+          <span class="status-pill ${isOnline ? 'status-active' : 'status-lock'}" style="font-size:11px;">
+            ${isOnline ? '🌐 Baza połączona (Google Sheets)' : '📱 Baza lokalna na tym urządzeniu'}
+          </span>
+        </div>
+      </div>
+
+      <!-- Filtry działów -->
+      <div style="display:flex; gap:6px; justify-content:center; margin-bottom:18px; flex-wrap:wrap;">
+        <button class="small ${rankingFilter === 'all' ? 'primary' : 'outline'}" style="font-size:12px; padding:6px 12px;" onclick="setRankingFilter('all')">Wszystkie działy</button>
+        <button class="small ${rankingFilter === 'd2' ? 'primary' : 'outline'}" style="font-size:12px; padding:6px 12px;" onclick="setRankingFilter('d2')">Dział II: Moja okolica</button>
+        <button class="small ${rankingFilter === 'd1' ? 'primary' : 'outline'}" style="font-size:12px; padding:6px 12px;" onclick="setRankingFilter('d1')">Dział I: Przyroda</button>
+      </div>
+
+      ${rankingLoading ? `
+        <div style="text-align:center; padding:36px; color:var(--muted); font-size:15px;">
+          ⏳ Pobieranie aktualnych wyników klasy...
+        </div>
+      ` : (filtered.length === 0 ? `
+        <div style="text-align:center; padding:32px 16px; background:#f9faf8; border-radius:14px; border:1px dashed var(--line); margin-bottom:18px;">
+          <div style="font-size:36px; margin-bottom:8px;">🌱</div>
+          <strong style="color:var(--brand); display:block; font-size:16px; margin-bottom:4px;">Brak zapisanych wyników w tej kategorii</strong>
+          <span style="font-size:13px; color:var(--muted); display:block; max-width:380px; margin:0 auto 16px;">Rozwiąż test powtórkowy i jako pierwszy wpisz się na tablicę chwały!</span>
+          <button class="primary small" onclick="startRandomQuiz('d2')">🎲 Rozwiąż losowy test teraz</button>
+        </div>
+      ` : `
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          ${filtered.map((entry, idx) => {
+            const isTop1 = idx === 0;
+            const isTop2 = idx === 1;
+            const isTop3 = idx === 2;
+            const badgeIcon = isTop1 ? '🥇' : (isTop2 ? '🥈' : (isTop3 ? '🥉' : (idx + 1) + '.'));
+            let borderStyle = 'border:1px solid var(--line); background:#ffffff;';
+            if (isTop1) borderStyle = 'border:2px solid #f59e0b; background:#fffdf5;';
+            else if (isTop2) borderStyle = 'border:1px solid #94a3b8; background:#f8fafc;';
+            else if (isTop3) borderStyle = 'border:1px solid #d97706; background:#fffaf0;';
+
+            const pctVal = entry.pct !== undefined ? entry.pct : Math.round((entry.score / (entry.total || 18)) * 100);
+
+            return `
+              <div style="${borderStyle} padding:12px 14px; border-radius:14px; display:flex; align-items:center; justify-content:space-between; gap:12px;">
+                <div style="display:flex; align-items:center; gap:12px; min-width:0;">
+                  <span style="font-size:20px; font-weight:800; min-width:28px; text-align:center;">${badgeIcon}</span>
+                  <span style="font-size:26px; flex-shrink:0;">${entry.avatar || '🦉'}</span>
+                  <div style="min-width:0;">
+                    <strong style="font-size:15px; color:var(--brand); display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                      ${entry.name || 'Odkrywca'}
+                    </strong>
+                    <span style="font-size:11px; color:var(--muted);">${entry.module || 'Test'} • ${entry.date || ''}</span>
+                  </div>
+                </div>
+                <div style="text-align:right; flex-shrink:0;">
+                  <span class="status-pill status-active" style="font-size:13px; font-weight:800; padding:4px 10px;">
+                    ${entry.score} / ${entry.total || 18} pkt
+                  </span>
+                  <div style="font-size:11px; color:var(--muted); margin-top:2px; font-weight:600;">${pctVal}%</div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `)}
+
+      <div style="margin-top:24px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+        <button class="primary" onclick="startRandomQuiz('d2')">🎲 Rozwiąż losowy test (Dział II)</button>
+        <button class="outline" onclick="openProfileModal()">👤 Zmień swój profil</button>
+      </div>
+    </div>
+  `;
+}
+
 // Inicjalizacja startowa
+updateTopPlayerPill();
 render();
 </script>
 </body>
