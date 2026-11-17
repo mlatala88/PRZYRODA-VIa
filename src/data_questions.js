@@ -176,7 +176,7 @@ module.exports = [
   // T5: Gleba w mojej okolicy
   {
     id: 'z1_t5_1', set: 1, topic: 4, skill: 'O02', type: 'choice',
-    q: 'Tymek porównuje wzrost rzeżuchy w ziemi z lasu i w piasku. O czym musi pamiętać, aby doświadczenie było rzetelne?',
+    q: 'Uczeń bada wzrost rzeżuchy w ziemi z lasu i w piasku. O czym musi pamiętać, aby doświadczenie było rzetelne?',
     opts: [
       'Musi podlewać obie doniczki dokładnie taką samą ilością wody i trzymać je w tym samym świetle.',
       'Doniczkę z piaskiem powinien schować do ciemnej szafy.',
@@ -665,7 +665,7 @@ module.exports = [
   // T5: Gleba w mojej okolicy
   {
     id: 'z3_t5_1', set: 3, topic: 4, skill: 'O02', type: 'choice',
-    q: 'Kasia posadziła fasolę w glebie piaszczystej i w ziemi próchnicznej. Po 2 tygodniach fasola w ziemi próchnicznej była dwukrotnie wyższa. Jaki jest prawidłowy wniosek?',
+    q: 'Podczas doświadczenia posadzono fasolę w glebie piaszczystej i w ziemi próchnicznej. Po 2 tygodniach fasola w ziemi próchnicznej była dwukrotnie wyższa. Jaki jest prawidłowy wniosek?',
     opts: [
       'Gleba bogata w próchnicę zapewnia lepsze warunki do wzrostu i rozwoju fasoli niż gleba piaszczysta.',
       'Fasola nie potrzebuje gleby do życia.',
@@ -750,7 +750,7 @@ module.exports = [
   // T1: Krajobraz
   {
     id: 'z4_t1_1', set: 4, topic: 0, skill: 'K03', type: 'choice',
-    q: 'Tymek ogląda zdjęcie: widać na nim wycięty las, wielki kamieniołom i ciężarówki wywożące urobek. Jaki to krajobraz?',
+    q: 'Młody badacz ogląda zdjęcie: widać na nim wycięty las, wielki kamieniołom i ciężarówki wywożące urobek. Jaki to krajobraz?',
     opts: [
       'Krajobraz naturalny',
       'Krajobraz przekształcony przez człowieka (przemysłowy)',
@@ -858,7 +858,7 @@ module.exports = [
   },
   {
     id: 'z4_t3_3', set: 4, topic: 2, skill: 'S05', type: 'choice',
-    q: 'Tymek znalazł kamień na plaży. Próbuje go zarysować stalowym gwoździem, ale gwóźdź nie zostawia śladu. Co to mówi o skale?',
+    q: 'Na wycieczce znaleziono kamień. Przy próbie zarysowania stalowym gwoździem okazuje się, że gwóźdź nie zostawia śladu. Co to mówi o skale?',
     opts: [
       'Skała jest bardzo miękka.',
       'Skała charakteryzuje się dużą twardością.',
@@ -1013,7 +1013,7 @@ module.exports = [
   },
   {
     id: 'z5_t1_2', set: 5, topic: 0, skill: 'K04', type: 'choice',
-    q: 'Tymek porównuje ruch drogowy w mieście i na wsi. Co jest prawdą?',
+    q: 'Porównując natężenie ruchu drogowego w dużym mieście i na wsi, co jest prawdą?',
     opts: [
       'W mieście ruch jest zazwyczaj znacznie większy, ulice są szersze i kursuje komunikacja miejska.',
       'Na wsi jest więcej sygnalizacji świetlnych i linii metra niż w Warszawie.',
@@ -1108,7 +1108,7 @@ module.exports = [
   },
   {
     id: 'z5_t3_3', set: 5, topic: 2, skill: 'S01', type: 'choice',
-    q: 'Tymek znalazł na spacerze kawałek czerwonej cegły i kawałek betonu. Czy są to skały w rozumieniu przyrody?',
+    q: 'Na spacerze znaleziono kawałek czerwonej cegły i kawałek betonu. Czy są to skały w rozumieniu przyrody?',
     opts: [
       'Tak, to skały lite.',
       'Nie, cegła i beton to wytwory człowieka, a nie naturalne skały.',
@@ -1669,7 +1669,7 @@ module.exports = [
   },
   {
     id: 'z7_t5_2', set: 7, topic: 4, skill: 'O02', type: 'choice',
-    q: 'Tymek badał dwie próby rzeżuchy. Wyniki zapisał w tabeli każdego dnia o tej samej porze. Dlaczego systematyczność jest ważna?',
+    q: 'Uczeń badał dwie próby rzeżuchy. Wyniki zapisał w tabeli każdego dnia o tej samej porze. Dlaczego systematyczność jest ważna?',
     opts: [
       'Pozwala na dokładne śledzenie tempa wzrostu i rzetelne porównanie obu roślin.',
       'Żeby szybciej skończyć lekcje.',

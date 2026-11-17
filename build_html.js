@@ -1,8 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 
-const topics = require('./src/data_topics.js');
-const questions = require('./src/data_questions.js');
+const d1_topics = require('./src/data_dzial1_topics.js');
+const d1_questions = require('./src/data_dzial1_questions.js');
+const d2_topics = require('./src/data_topics.js');
+const d2_questions = require('./src/data_questions.js');
 
 const htmlContent = `<!DOCTYPE html>
 <html lang="pl">
@@ -10,7 +12,7 @@ const htmlContent = `<!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#173d34">
-<title>Odkrywam Przyrodę — Misja Tymka</title>
+<title>Odkrywam Przyrodę — Klasa 4</title>
 <style>
 :root {
   --brand: #173d34;
@@ -61,6 +63,8 @@ header.app-bar {
   font-weight: 800;
   font-size: 18px;
   letter-spacing: -0.3px;
+  cursor: pointer;
+  user-select: none;
 }
 .brand-icon {
   background: var(--lime);
@@ -75,10 +79,11 @@ header.app-bar {
 }
 .nav-pill {
   background: rgba(255,255,255,0.15);
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: 20px;
   font-size: 13px;
   font-weight: 600;
+  cursor: pointer;
 }
 main.app-wrap {
   max-width: 960px;
@@ -150,9 +155,9 @@ button.outline {
 }
 .hero-card p {
   margin: 0;
-  max-width: 580px;
+  max-width: 620px;
   color: #d1e5dd;
-  font-size: 16px;
+  font-size: 15px;
 }
 .hero-meta {
   display: flex;
@@ -207,7 +212,7 @@ button.outline {
 .module-desc {
   color: var(--muted);
   font-size: 14px;
-  margin: 0;
+  margin: 4px 0 0;
 }
 .module-actions {
   display: flex;
@@ -529,39 +534,88 @@ button.outline {
 <body>
 
 <header class="app-bar">
-  <div class="brand-title">
+  <div class="brand-title" onclick="currentView='hub'; render();">
     <div class="brand-icon">🌱</div>
     <span>Odkrywam Przyrodę 4</span>
   </div>
-  <div id="topMeta" class="nav-pill">Misja Tymka</div>
+  <div id="topMeta" class="nav-pill" onclick="currentView='hub'; render();">Odkrywca 🌿</div>
 </header>
 
 <main class="app-wrap" id="appMain"></main>
 
 <script>
-// Kompletne dane aplikacji
-const TOPICS = ${JSON.stringify(topics)};
-const QUESTIONS = ${JSON.stringify(questions)};
+// ==========================================
+// DANE MODUŁÓW (DZIAŁ I i DZIAŁ II)
+// ==========================================
+const MODULES = {
+  d1: {
+    id: 'd1',
+    numStr: 'Dział I',
+    title: 'Spotkanie z przyrodą',
+    pages: '11–52',
+    desc: 'Zmysły badacza, mikroskop optyczny, róża wiatrów i kompas, zasady doświadczeń, higiena pracy umysłowej i cyfrowy dobrostan.',
+    topics: ${JSON.stringify(d1_topics)},
+    questions: ${JSON.stringify(d1_questions)},
+    maxSets: 5,
+    qPerSet: 15,
+    badge: '✓ Pełny moduł (5 tematów + 5 testów)'
+  },
+  d2: {
+    id: 'd2',
+    numStr: 'Dział II',
+    title: 'Moja okolica',
+    pages: '53–90',
+    desc: 'Krajobraz naturalny i przekształcony, ukształtowanie terenu, skały i minerały, warstwy gleby oraz rozpoznawanie roślin, ptaków i owadów.',
+    topics: ${JSON.stringify(d2_topics)},
+    questions: ${JSON.stringify(d2_questions)},
+    maxSets: 7,
+    qPerSet: 18,
+    badge: '★ Opracowany moduł (6 tematów + 7 testów)'
+  }
+};
 
-// Model stanu aplikacji (localStorage persistence)
-const STORE_KEY = 'tymek_przyroda_v2';
+// ==========================================
+// MODEL STANU (localStorage)
+// ==========================================
+const STORE_KEY = 'odkrywam_przyrode_v2';
+const LEGACY_KEY = 'tymek_przyroda_v2';
+
 function loadState() {
   try {
-    const raw = localStorage.getItem(STORE_KEY);
-    if (raw) return JSON.parse(raw);
+    const raw = localStorage.getItem(STORE_KEY) || localStorage.getItem(LEGACY_KEY);
+    if (raw) {
+      const p = JSON.parse(raw);
+      return {
+        currentModuleId: p.currentModuleId || 'd2',
+        usedSets: {
+          d1: (p.usedSets && Array.isArray(p.usedSets.d1)) ? p.usedSets.d1 : [],
+          d2: Array.isArray(p.usedSets) ? p.usedSets : ((p.usedSets && p.usedSets.d2) ? p.usedSets.d2 : [])
+        },
+        history: p.history || [],
+        completedLearnSteps: p.completedLearnSteps || {}
+      };
+    }
   } catch(e) {}
   return {
-    usedSets: [],
+    currentModuleId: 'd2',
+    usedSets: { d1: [], d2: [] },
     history: [],
     completedLearnSteps: {}
   };
 }
+
 function saveState() {
-  localStorage.setItem(STORE_KEY, JSON.stringify(state));
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify(state));
+  } catch(e) {}
 }
+
 let state = loadState();
 
-// Routing & widoki
+// ==========================================
+// ROUTING I ZMIENNE APLIKACJI
+// ==========================================
+let currentModuleId = state.currentModuleId || 'd2';
 let currentView = 'hub'; // 'hub' | 'learn_list' | 'learn_step' | 'quiz' | 'results'
 let currentTopicIdx = 0;
 let currentStepIdx = 0;
@@ -569,14 +623,15 @@ let activeQuizSet = 1;
 let quizQuestions = [];
 let quizQIndex = 0;
 let quizScore = 0;
-let quizTopicScores = [0, 0, 0, 0, 0, 0];
+let quizTopicScores = [];
 let quizAnswersLog = [];
 
-// Interakcja bieżącego pytania
+// Stan interakcji pytania
 let quizSelection = null;
 let quizBinsState = {};
 let quizOrderState = [];
 let quizMatchState = { selectedLeft: null, pairs: {} };
+let activeDiscoveryIdx = null;
 
 function render() {
   const root = document.getElementById('appMain');
@@ -591,32 +646,40 @@ function render() {
 // 1. EKRAN GŁÓWNY (HUB)
 // ----------------------------------------------------
 function renderHub(root) {
-  const completedSetsCount = state.usedSets.length;
+  const d1Completed = (state.usedSets.d1 || []).length;
+  const d2Completed = (state.usedSets.d2 || []).length;
+  const totalCompleted = d1Completed + d2Completed;
+
   root.innerHTML = \`
     <div class="hero-card">
       <div style="font-size: 12px; font-weight:800; letter-spacing:1.5px; opacity:0.8; text-transform:uppercase;">Nowa Era • Klasa 4</div>
-      <h1>Cześć, Tymek! 🌿</h1>
-      <p>Przed Tobą interaktywny podręcznik do przyrody. Przygotuj się do najbliższego sprawdzianu: poznaj tajemnice swojej okolicy w trybie <strong>Nauka</strong>, a potem sprawdź wiedzę w teście!</p>
+      <h1>Cześć, Odkrywco! 🌿</h1>
+      <p>Przed Tobą interaktywny podręcznik przyrody dla klasy 4 („Odkrywam przyrodę”, Nowa Era). Wybierz dział, poznawaj wiedzę krok po kroku w trybie <strong>Nauka</strong>, a potem sprawdź się w różnorodnych testach bez pisania na klawiaturze!</p>
       <div class="hero-meta">
-        <span class="meta-chip">🏆 Rozwiązane zestawy: \${completedSetsCount} / 7</span>
-        <span class="meta-chip">📚 Dział II: Moja okolica (s. 53–90)</span>
+        <span class="meta-chip">📚 Dział I: \${d1Completed} / \${MODULES.d1.maxSets} zestawów</span>
+        <span class="meta-chip">📚 Dział II: \${d2Completed} / \${MODULES.d2.maxSets} zestawów</span>
+        <span class="meta-chip">🏆 Rozwiązane testy: \${totalCompleted}</span>
       </div>
     </div>
 
     <h2 style="font-size: 20px; margin: 24px 0 14px;">Działy podręcznika</h2>
     <div class="modules-grid">
       <!-- DZIAŁ I -->
-      <div class="module-card">
+      <div class="module-card \${currentModuleId === 'd1' ? 'featured' : ''}">
         <div class="module-head">
           <div>
-            <div class="module-num">Dział I • s. 4–52</div>
-            <h3 class="module-title">Odkrywam tajemnice przyrody</h3>
-            <p class="module-desc">Zmysły badacza, mikroskop, kompas, planowanie doświadczeń i koncentracja.</p>
+            <div class="module-num" style="color:var(--green);">\${MODULES.d1.numStr} • s. \${MODULES.d1.pages}</div>
+            <h3 class="module-title">\${MODULES.d1.title}</h3>
+            <p class="module-desc">\${MODULES.d1.desc}</p>
           </div>
-          <span class="status-pill status-active">✓ Opracowany</span>
+          <span class="status-pill status-active">\${MODULES.d1.badge}</span>
+        </div>
+        <div style="background:#eaf5eb; padding:12px 16px; border-radius:12px; font-size:13px; font-weight:600; color:var(--brand);">
+          🎯 W bazie czeka 5 zestawów testowych (75 zadań). Za każdym podejściem otrzymujesz nowe pytania!
         </div>
         <div class="module-actions">
-          <button class="small" onclick="window.location.href='Misja-Przyroda-Tymek.html'">Otwórz mini-grę (Dział I) →</button>
+          <button class="primary" onclick="openLearnList('d1')">📖 Nauka (5 tematów)</button>
+          <button class="accent" onclick="startQuizAuto('d1')">🎯 Sprawdź wiedzę (Test 15 pytań)</button>
         </div>
       </div>
 
@@ -624,22 +687,22 @@ function renderHub(root) {
       <div class="module-card featured">
         <div class="module-head">
           <div>
-            <div class="module-num" style="color:var(--green);">Główny moduł • Najbliższy sprawdzian</div>
-            <h3 class="module-title" style="font-size: 24px;">Dział II: Moja okolica</h3>
-            <p class="module-desc">Krajobraz, ukształtowanie terenu, skały, profil gleby oraz 6 roślin, 6 ptaków i 3 owady ze zdjęć.</p>
+            <div class="module-num" style="color:var(--green);">\${MODULES.d2.numStr} • s. \${MODULES.d2.pages} • Najbliższy sprawdzian</div>
+            <h3 class="module-title" style="font-size: 24px;">\${MODULES.d2.title}</h3>
+            <p class="module-desc">\${MODULES.d2.desc}</p>
           </div>
-          <span class="status-pill status-active">★ Gotowy do nauki</span>
+          <span class="status-pill status-active">\${MODULES.d2.badge}</span>
         </div>
         <div style="background:#eaf5eb; padding:12px 16px; border-radius:12px; font-size:13px; font-weight:600; color:var(--brand);">
-          🎯 W bazie czeka 7 różnych zestawów testowych (126 zadań). Każde podejście daje nowe pytania!
+          🎯 W bazie czeka 7 różnych zestawów testowych (126 zadań). Pełna rotacja pytań (3–7 podejść bez powtórek)!
         </div>
         <div class="module-actions">
-          <button class="primary" onclick="openLearnList()">📖 Przejdź do Nauki (6 tematów)</button>
-          <button class="accent" onclick="startQuizAuto()">🎯 Sprawdź wiedzę (Test 18 pytań)</button>
+          <button class="primary" onclick="openLearnList('d2')">📖 Nauka (6 tematów)</button>
+          <button class="accent" onclick="startQuizAuto('d2')">🎯 Sprawdź wiedzę (Test 18 pytań)</button>
         </div>
       </div>
 
-      <!-- DZIAŁY III-VI -->
+      <!-- DZIAŁY III-IV (W PRZYGOTOWANIU) -->
       <div class="module-card" style="opacity: 0.65;">
         <div class="module-head">
           <div>
@@ -647,17 +710,18 @@ function renderHub(root) {
             <h3 class="module-title">Odkrywam krajobrazy Polski</h3>
             <p class="module-desc">Pobrzeża, pojezierza, niziny, wyżyny i góry Polski.</p>
           </div>
-          <span class="status-pill status-lock">🔒 Wkrótce</span>
+          <span class="status-pill status-lock">🔒 W przygotowaniu</span>
         </div>
       </div>
+
       <div class="module-card" style="opacity: 0.65;">
         <div class="module-head">
           <div>
             <div class="module-num">Dział IV • s. 141–180</div>
             <h3 class="module-title">Odkrywam lądy i oceany</h3>
-            <p class="module-desc">Kontynenty, morza, strefy oświetlenia i podróżnicy.</p>
+            <p class="module-desc">Kontynenty, oceany, strefy oświetlenia Ziemi i wielcy podróżnicy.</p>
           </div>
-          <span class="status-pill status-lock">🔒 Wkrótce</span>
+          <span class="status-pill status-lock">🔒 W przygotowaniu</span>
         </div>
       </div>
     </div>
@@ -669,8 +733,8 @@ function renderHub(root) {
 }
 
 function resetProgress() {
-  if (confirm('Czy na pewno chcesz zresetować zapisane podejścia do testów?')) {
-    state = { usedSets: [], history: [], completedLearnSteps: {} };
+  if (confirm('Czy na pewno chcesz zresetować zapisane podejścia do testów dla wszystkich działów?')) {
+    state = { currentModuleId: 'd2', usedSets: { d1: [], d2: [] }, history: [], completedLearnSteps: {} };
     saveState();
     render();
   }
@@ -679,14 +743,17 @@ function resetProgress() {
 // ----------------------------------------------------
 // 2. SPIS TEMATÓW NAUKI
 // ----------------------------------------------------
-function openLearnList() {
+function openLearnList(modId) {
+  if (modId) currentModuleId = modId;
   currentView = 'learn_list';
   render();
 }
 
 function renderLearnList(root) {
+  const mod = MODULES[currentModuleId];
   let listHtml = '';
-  TOPICS.forEach((t, idx) => {
+
+  mod.topics.forEach((t, idx) => {
     const doneSteps = (state.completedLearnSteps[t.id] || []).length;
     const totalSteps = t.steps.length;
     const isDone = doneSteps >= totalSteps;
@@ -715,10 +782,10 @@ function renderLearnList(root) {
     </div>
     <div class="panel">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
-        <h2 style="margin:0; font-size:22px;">📖 Wybierz temat do nauki (Dział II)</h2>
+        <h2 style="margin:0; font-size:22px;">📖 Wybierz temat do nauki — \${mod.title} (\${mod.pages})</h2>
       </div>
       <p style="color:var(--muted); font-size:14px; margin-bottom:20px;">
-        W każdym temacie znajdziesz proste wyjaśnienia, schematy z odkrywanymi podpisami oraz przykłady z podręcznika.
+        W każdym temacie znajdziesz proste wyjaśnienia, interaktywne schematy oraz przykłady z podręcznika zgodne z wymaganiami szkolnymi.
       </p>
       <div style="display:flex; flex-direction:column; gap:12px;">
         \${listHtml}
@@ -730,6 +797,7 @@ function renderLearnList(root) {
 function openLearnTopic(idx) {
   currentTopicIdx = idx;
   currentStepIdx = 0;
+  activeDiscoveryIdx = null;
   currentView = 'learn_step';
   render();
 }
@@ -737,10 +805,9 @@ function openLearnTopic(idx) {
 // ----------------------------------------------------
 // 3. EKRAN KROKU NAUKI
 // ----------------------------------------------------
-let activeDiscoveryIdx = null;
-
 function renderLearnStep(root) {
-  const topic = TOPICS[currentTopicIdx];
+  const mod = MODULES[currentModuleId];
+  const topic = mod.topics[currentTopicIdx];
   const step = topic.steps[currentStepIdx];
   const totalSteps = topic.steps.length;
 
@@ -762,7 +829,7 @@ function renderLearnStep(root) {
   }
   if (step.details) {
     bodyHtml += '<div style="background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px; margin-bottom:14px;">';
-    bodyHtml += '<div style="font-weight:700; font-size:13px; color:var(--brand); margin-bottom:6px;">Warunki, które muszą być identyczne w obu próbach:</div>';
+    bodyHtml += '<div style="font-weight:700; font-size:13px; color:var(--brand); margin-bottom:6px;">Wskazówki efektywnej pracy:</div>';
     bodyHtml += '<ul style="margin:0; padding-left:20px; font-size:13px; display:flex; flex-direction:column; gap:4px;">';
     step.details.forEach(d => bodyHtml += \`<li>✓ \${d}</li>\`);
     bodyHtml += '</ul></div>';
@@ -778,18 +845,24 @@ function renderLearnStep(root) {
     bodyHtml += '</div>';
   }
   if (step.table) {
+    const isCustomHeader = step.table[0] && (step.table[0].feat === 'Zmysł');
+    const th1 = isCustomHeader ? step.table[0].feat : 'Cecha';
+    const th2 = isCustomHeader ? step.table[0].city : '🏙️ Miasto';
+    const th3 = isCustomHeader ? step.table[0].village : '🏡 Wieś';
+    const rows = isCustomHeader ? step.table.slice(1) : step.table;
+
     bodyHtml += \`
       <div style="overflow-x:auto; margin:14px 0; border:1px solid var(--line); border-radius:12px; background:#fff;">
         <table style="width:100%; border-collapse:collapse; font-size:14px; text-align:left;">
           <thead>
             <tr style="background:#f0f5ec; color:var(--brand);">
-              <th style="padding:10px 14px; border-bottom:1px solid var(--line);">Cecha</th>
-              <th style="padding:10px 14px; border-bottom:1px solid var(--line);">🏙️ Miasto</th>
-              <th style="padding:10px 14px; border-bottom:1px solid var(--line);">🏡 Wieś</th>
+              <th style="padding:10px 14px; border-bottom:1px solid var(--line);">\${th1}</th>
+              <th style="padding:10px 14px; border-bottom:1px solid var(--line);">\${th2}</th>
+              <th style="padding:10px 14px; border-bottom:1px solid var(--line);">\${th3}</th>
             </tr>
           </thead>
           <tbody>
-            \${step.table.map(r => \`
+            \${rows.map(r => \`
               <tr style="border-bottom:1px solid #f0f0f0;">
                 <td style="padding:10px 14px; font-weight:700;">\${r.feat}</td>
                 <td style="padding:10px 14px;">\${r.city}</td>
@@ -833,7 +906,7 @@ function renderLearnStep(root) {
         <div style="background:#fff; border:1px solid var(--line); border-radius:14px; padding:16px;">
           <div style="font-size:28px; margin-bottom:6px;">\${c.icon || '📍'}</div>
           <h4 style="margin:0 0 6px; font-size:17px; color:var(--brand);">\${c.name}</h4>
-          <div style="font-size:13px; font-weight:700; color:var(--muted); margin-bottom:6px;">Kształt: \${c.shape}</div>
+          <div style="font-size:13px; font-weight:700; color:var(--muted); margin-bottom:6px;">Kształt / Działanie: \${c.shape}</div>
           <div style="font-size:14px;">\${c.features}</div>
         </div>
       \`;
@@ -980,7 +1053,7 @@ function renderLearnStep(root) {
         <div style="background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px;">
           <div style="font-size:22px; margin-bottom:4px;">\${th.icon}</div>
           <div style="font-weight:800; font-size:16px;">\${th.form}</div>
-          <div style="font-size:13px; font-weight:700; color:var(--brand);">Wysokość: \${th.height}</div>
+          <div style="font-size:13px; font-weight:700; color:var(--brand);">Wysokość / Wartość: \${th.height}</div>
           <div style="font-size:12px; color:var(--muted); margin-top:4px;">\${th.example}</div>
         </div>
       \`;
@@ -1081,7 +1154,8 @@ function prevStep() {
   }
 }
 function nextStep() {
-  const topic = TOPICS[currentTopicIdx];
+  const mod = MODULES[currentModuleId];
+  const topic = mod.topics[currentTopicIdx];
   markStepDone(topic.id, currentStepIdx);
   if (currentStepIdx < topic.steps.length - 1) {
     currentStepIdx++;
@@ -1090,7 +1164,8 @@ function nextStep() {
   }
 }
 function finishTopic() {
-  const topic = TOPICS[currentTopicIdx];
+  const mod = MODULES[currentModuleId];
+  const topic = mod.topics[currentTopicIdx];
   markStepDone(topic.id, currentStepIdx);
   alert('Brawo! Ukończyłeś cały temat: ' + topic.title);
   currentView = 'learn_list';
@@ -1107,19 +1182,21 @@ function markStepDone(topicId, stepIdx) {
 // ----------------------------------------------------
 // 4. TRYB TESTU (SPRAWDŹ WIEDZĘ)
 // ----------------------------------------------------
-function startQuizAuto() {
-  // Wybierz kolejny niewykorzystany zestaw (1 do 7)
+function startQuizAuto(modId) {
+  if (modId) currentModuleId = modId;
+  const mod = MODULES[currentModuleId];
+  if (!state.usedSets[currentModuleId]) state.usedSets[currentModuleId] = [];
+
   let nextSet = 1;
-  for (let s = 1; s <= 7; s++) {
-    if (!state.usedSets.includes(s)) {
+  for (let s = 1; s <= mod.maxSets; s++) {
+    if (!state.usedSets[currentModuleId].includes(s)) {
       nextSet = s;
       break;
     }
   }
-  // Jeśli wszystkie 7 zostały rozwiązane, powiadom i zacznij pętlę
-  if (state.usedSets.length >= 7) {
-    alert('Rozwiązałeś już wszystkie 7 zestawów! Rozpoczynamy nową serię powtórkową.');
-    state.usedSets = [];
+  if (state.usedSets[currentModuleId].length >= mod.maxSets) {
+    alert('Rozwiązałeś już wszystkie ' + mod.maxSets + ' zestawów z tego działu! Rozpoczynamy nową serię powtórkową.');
+    state.usedSets[currentModuleId] = [];
     saveState();
     nextSet = 1;
   }
@@ -1127,11 +1204,12 @@ function startQuizAuto() {
 }
 
 function startQuiz(setNum) {
+  const mod = MODULES[currentModuleId];
   activeQuizSet = setNum;
-  quizQuestions = QUESTIONS.filter(q => q.set === setNum);
+  quizQuestions = mod.questions.filter(q => q.set === setNum);
   quizQIndex = 0;
   quizScore = 0;
-  quizTopicScores = [0, 0, 0, 0, 0, 0];
+  quizTopicScores = new Array(mod.topics.length).fill(0);
   quizAnswersLog = [];
   initQuestionState();
   currentView = 'quiz';
@@ -1154,13 +1232,14 @@ function initQuestionState() {
 }
 
 function renderQuiz(root) {
+  const mod = MODULES[currentModuleId];
   const q = quizQuestions[quizQIndex];
   if (!q) {
     finishQuiz();
     return;
   }
 
-  const topic = TOPICS[q.topic];
+  const topic = mod.topics[q.topic];
   const progressPct = ((quizQIndex) / quizQuestions.length) * 100;
   const answered = quizAnswersLog[quizQIndex] !== undefined;
 
@@ -1250,7 +1329,75 @@ function renderQuiz(root) {
     }
   }
 
-  // 4. Hotspot
+  // 4. Order
+  else if (q.type === 'order') {
+    interactHtml += '<div class="order-list">';
+    quizOrderState.forEach((item, pos) => {
+      interactHtml += \`
+        <div class="order-row">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="background:var(--brand); color:#fff; width:28px; height:28px; border-radius:50%; display:grid; place-items:center; font-weight:800; font-size:13px;">\${pos+1}</div>
+            <div style="font-weight:600; font-size:15px;">\${item.text}</div>
+          </div>
+          \${!answered ? \`
+            <div class="order-controls">
+              <button class="small" \${pos === 0 ? 'disabled' : ''} onclick="moveOrderItem(\${pos}, -1)">▲</button>
+              <button class="small" \${pos === quizOrderState.length - 1 ? 'disabled' : ''} onclick="moveOrderItem(\${pos}, 1)">▼</button>
+            </div>
+          \` : ''}
+        </div>
+      \`;
+    });
+    interactHtml += '</div>';
+    if (!answered) {
+      interactHtml += \`<div style="margin-top:16px;"><button class="primary" onclick="submitOrder()">Zatwierdź kolejność</button></div>\`;
+    }
+  }
+
+  // 5. Match (Pary)
+  else if (q.type === 'match') {
+    const leftPaired = Object.keys(quizMatchState.pairs).map(Number);
+    const rightPaired = Object.values(quizMatchState.pairs);
+
+    interactHtml += '<div style="font-size:13px; font-weight:700; color:var(--brand); margin-bottom:8px;">Kliknij element po lewej stronie, a następnie pasujący element po prawej:</div>';
+    interactHtml += '<div class="match-grid">';
+    
+    // Lewa kolumna
+    interactHtml += '<div class="match-col">';
+    q.pairs.forEach((p, idx) => {
+      const isPaired = leftPaired.includes(idx);
+      const isSel = quizMatchState.selectedLeft === idx;
+      let cls = 'match-btn opt-btn';
+      if (isPaired) cls += ' paired';
+      if (isSel) cls += ' selected';
+      interactHtml += \`<button class="\${cls}" \${answered ? 'disabled' : ''} onclick="pickMatchLeft(\${idx})">\${p.left}</button>\`;
+    });
+    interactHtml += '</div>';
+
+    // Prawa kolumna (losowa lub stała wg definicji)
+    interactHtml += '<div class="match-col">';
+    q.pairs.forEach((p, idx) => {
+      const isPaired = rightPaired.includes(idx);
+      let cls = 'match-btn opt-btn';
+      if (isPaired) cls += ' paired';
+      interactHtml += \`<button class="\${cls}" \${answered ? 'disabled' : ''} onclick="pickMatchRight(\${idx})">\${p.right}</button>\`;
+    });
+    interactHtml += '</div>';
+
+    interactHtml += '</div>';
+
+    if (!answered) {
+      const allPaired = Object.keys(quizMatchState.pairs).length === q.pairs.length;
+      interactHtml += \`
+        <div style="display:flex; gap:10px; margin-top:16px;">
+          <button class="primary" \${!allPaired ? 'disabled' : ''} onclick="submitMatch()">Sprawdź dopasowanie</button>
+          \${Object.keys(quizMatchState.pairs).length > 0 ? \`<button class="small outline" onclick="resetPairs()">Wyczyść połączenia</button>\` : ''}
+        </div>
+      \`;
+    }
+  }
+
+  // 6. Hotspot (Klikalna ilustracja SVG)
   else if (q.type === 'hotspot') {
     interactHtml += \`
       <div class="hotspot-svg-wrap">
@@ -1281,98 +1428,49 @@ function renderQuiz(root) {
     }
   }
 
-  // 5. Order
-  else if (q.type === 'order') {
-    interactHtml += '<div class="order-list">';
-    quizOrderState.forEach((it, idx) => {
-      interactHtml += \`
-        <div class="order-row">
-          <div style="display:flex; align-items:center; gap:12px;">
-            <span style="background:var(--lime); color:var(--brand); width:28px; height:28px; border-radius:50%; display:grid; place-items:center; font-weight:800; font-size:14px;">\${idx+1}</span>
-            <span style="font-size:14px; font-weight:600;">\${it.text}</span>
-          </div>
-          \${!answered ? \`
-            <div class="order-controls">
-              <button class="small" onclick="moveOrder(\${idx}, -1)" \${idx===0?'disabled':''}>▲</button>
-              <button class="small" onclick="moveOrder(\${idx}, 1)" \${idx===quizOrderState.length-1?'disabled':''}>▼</button>
-            </div>
-          \` : ''}
-        </div>
-      \`;
-    });
-    interactHtml += '</div>';
-    if (!answered) {
-      interactHtml += \`<div style="margin-top:16px;"><button class="primary" onclick="submitOrder()">Sprawdź kolejność</button></div>\`;
-    }
-  }
-
-  // 6. Match
-  else if (q.type === 'match') {
-    interactHtml += '<div style="font-size:13px; font-weight:700; color:var(--brand); margin-bottom:8px;">Kliknij element z lewej, a potem pasujący z prawej:</div>';
-    interactHtml += '<div class="match-grid">';
-    
-    // Lewa kolumna
-    interactHtml += '<div class="match-col">';
-    q.pairs.forEach((p, idx) => {
-      const isPaired = quizMatchState.pairs[idx] !== undefined;
-      const isSel = quizMatchState.selectedLeft === idx;
-      interactHtml += \`
-        <button class="match-btn \${isPaired ? 'paired' : ''} \${isSel ? 'selected' : ''}" onclick="selectMatchLeft(\${idx})" \${isPaired || answered ? 'disabled' : ''}>
-          \${p.left} \${isPaired ? '✓' : ''}
-        </button>
-      \`;
-    });
-    interactHtml += '</div>';
-
-    // Prawa kolumna (losowo lub stała kolejność)
-    interactHtml += '<div class="match-col">';
-    q.pairs.forEach((p, idx) => {
-      // sprawdź czy ta prawa opcja jest już połączona
-      const isAssigned = Object.values(quizMatchState.pairs).includes(idx);
-      interactHtml += \`
-        <button class="match-btn \${isAssigned ? 'paired' : ''}" onclick="assignMatchRight(\${idx})" \${isAssigned || answered ? 'disabled' : ''}>
-          \${p.right}
-        </button>
-      \`;
-    });
-    interactHtml += '</div>';
-    interactHtml += '</div>';
-
-    const allPaired = Object.keys(quizMatchState.pairs).length === q.pairs.length;
-    if (!answered) {
-      interactHtml += \`<div style="margin-top:16px;"><button class="primary" \${!allPaired ? 'disabled' : ''} onclick="submitMatch()">Sprawdź połączenia</button></div>\`;
-    }
-  }
-
-  // Feedback box if answered
+  // Pudełko wyjaśnienia po sprawdzeniu
   let feedbackHtml = '';
   if (answered) {
-    const isOk = quizAnswersLog[quizQIndex].isCorrect;
+    const isCorrect = quizAnswersLog[quizQIndex].isCorrect;
     feedbackHtml = \`
-      <div class="feedback-box \${isOk ? '' : 'bad'}">
-        <h4>\${isOk ? '🎉 Znakomicie, poprawna odpowiedź!' : '💡 Dobra próba! Wyjaśnienie z podręcznika:'}</h4>
+      <div class="feedback-box \${isCorrect ? '' : 'bad'}">
+        <h4>\${isCorrect ? '✅ Świetnie! Prawidłowa odpowiedź' : '❌ Niestety, to nie jest poprawna odpowiedź'}</h4>
         <p>\${q.why}</p>
-        <button class="primary" onclick="nextQuestion()">Następne zadanie →</button>
+        <div style="font-size:12px; color:var(--muted); margin-bottom:14px;"><strong>Źródło podręcznika:</strong> s. \${q.src}</div>
+        <button class="accent" onclick="nextQuestion()">
+          \${quizQIndex < quizQuestions.length - 1 ? 'Następne zadanie →' : 'Zobacz wynik testu 🏆'}
+        </button>
       </div>
     \`;
   }
 
   root.innerHTML = \`
     <div class="top-bar-quiz">
-      <button class="small" onclick="quitQuiz()">✕ Przerwij test</button>
-      <div style="font-size:13px; font-weight:700; color:var(--muted);">
-        Zadanie \${quizQIndex + 1} z \${quizQuestions.length} • Zestaw \${activeQuizSet}
-      </div>
+      <button class="small" onclick="quitQuiz()">✕ Zakończ test</button>
+      <span class="status-pill status-active">
+        \${mod.numStr} • Zestaw \${activeQuizSet} z \${mod.maxSets} • Zadanie \${quizQIndex + 1} / \${quizQuestions.length}
+      </span>
     </div>
-    <div class="progress-bar"><div style="width:\${progressPct}%;"></div></div>
+
+    <div class="progress-bar">
+      <div style="width:\${progressPct}%;"></div>
+    </div>
 
     <div class="panel">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-        <span class="status-pill status-active">\${topic.title} • s. \${q.src}</span>
-        <span style="font-size:12px; font-weight:700; color:var(--muted);">Kod: \${q.skill}</span>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <span class="status-pill status-lock" style="font-size:11px;">Temat: \${topic.title}</span>
+        <span style="font-size:12px; color:var(--muted);">Punkty: \${quizScore} / \${quizQuestions.length}</span>
       </div>
+
       <div class="q-title">\${q.q}</div>
-      <div class="q-instruction">Nie musisz pisać nic na klawiaturze — wybierz, połącz lub ułóż właściwe elementy.</div>
+      <div class="q-instruction">
+        \${q.type === 'choice' ? 'Wybierz jedną właściwą odpowiedź:' : ''}
+        \${q.type === 'multichoice' ? 'Zaznacz wszystkie poprawne odpowiedzi (wielokrotny wybór):' : ''}
+        \${q.type === 'bin_sort' ? 'Rozdziel elementy klikając na nie, a następnie na koszyk:' : ''}
+        \${q.type === 'order' ? 'Ustaw elementy w odpowiedniej kolejności za pomocą strzałek:' : ''}
+        \${q.type === 'match' ? 'Dobierz pasujące elementy w pary:' : ''}
+        \${q.type === 'hotspot' ? 'Wskaż właściwy punkt na ilustracji poniżej:' : ''}
+      </div>
 
       \${interactHtml}
       \${feedbackHtml}
@@ -1380,8 +1478,9 @@ function renderQuiz(root) {
   \`;
 }
 
-// Handlers interakcji testu
+// Obsługa interakcji pytań
 function pickChoice(idx) {
+  if (quizAnswersLog[quizQIndex] !== undefined) return;
   quizSelection = idx;
   render();
 }
@@ -1392,66 +1491,61 @@ function submitChoice() {
 }
 
 function toggleMulti(idx) {
+  if (quizAnswersLog[quizQIndex] !== undefined) return;
   if (!quizSelection) quizSelection = [];
-  if (quizSelection.includes(idx)) {
-    quizSelection = quizSelection.filter(i => i !== idx);
-  } else {
-    quizSelection.push(idx);
-  }
+  const pos = quizSelection.indexOf(idx);
+  if (pos === -1) quizSelection.push(idx);
+  else quizSelection.splice(pos, 1);
   render();
 }
 function submitMulti() {
   const q = quizQuestions[quizQIndex];
-  const sortedUser = (quizSelection || []).slice().sort().join(',');
-  const sortedCorrect = q.correctIndices.slice().sort().join(',');
-  const isCorrect = (sortedUser === sortedCorrect);
+  const sel = [...quizSelection].sort();
+  const corr = [...q.correctIndices].sort();
+  const isCorrect = (sel.length === corr.length) && sel.every((v, i) => v === corr[i]);
   recordAnswer(isCorrect);
 }
 
-function selectSortItem(id) {
-  quizBinsState.selectedItem = id;
+function selectSortItem(itemId) {
+  if (quizAnswersLog[quizQIndex] !== undefined) return;
+  quizBinsState.selectedItem = itemId;
   render();
 }
-function assignToBin(bIdx) {
+function assignToBin(binIdx) {
+  if (quizAnswersLog[quizQIndex] !== undefined) return;
   if (quizBinsState.selectedItem === null) return;
-  const item = quizBinsState.items.find(it => it.id === quizBinsState.selectedItem);
-  if (item) item.bin = bIdx;
-  quizBinsState.selectedItem = null;
-  render();
+  const it = quizBinsState.items.find(x => x.id === quizBinsState.selectedItem);
+  if (it) {
+    it.bin = binIdx;
+    quizBinsState.selectedItem = null;
+    render();
+  }
 }
-function unassignItem(id) {
-  const item = quizBinsState.items.find(it => it.id === id);
-  if (item) item.bin = null;
-  render();
+function unassignItem(itemId) {
+  if (quizAnswersLog[quizQIndex] !== undefined) return;
+  const it = quizBinsState.items.find(x => x.id === itemId);
+  if (it) {
+    it.bin = null;
+    render();
+  }
 }
 function submitBinSort() {
   const q = quizQuestions[quizQIndex];
-  let correctCount = 0;
-  q.items.forEach((it, idx) => {
-    const userItem = quizBinsState.items.find(u => u.id === idx);
-    if (userItem && userItem.bin === it.bin) correctCount++;
+  let isCorrect = true;
+  q.items.forEach((orig, idx) => {
+    const cur = quizBinsState.items.find(x => x.id === idx);
+    if (!cur || cur.bin !== orig.bin) isCorrect = false;
   });
-  const isCorrect = (correctCount === q.items.length);
   recordAnswer(isCorrect);
 }
 
-function pickHotspot(idx) {
-  quizSelection = idx;
-  render();
-}
-function submitHotspot() {
-  const q = quizQuestions[quizQIndex];
-  const hs = q.hotspots[quizSelection];
-  const isCorrect = hs && hs.correct === true;
-  recordAnswer(isCorrect);
-}
-
-function moveOrder(idx, dir) {
-  const target = idx + dir;
+function moveOrderItem(pos, dir) {
+  if (quizAnswersLog[quizQIndex] !== undefined) return;
+  const target = pos + dir;
   if (target < 0 || target >= quizOrderState.length) return;
-  const temp = quizOrderState[idx];
-  quizOrderState[idx] = quizOrderState[target];
-  quizOrderState[target] = temp;
+  const tmp = quizOrderState[pos];
+  quizOrderState[pos] = quizOrderState[target];
+  quizOrderState[target] = tmp;
   render();
 }
 function submitOrder() {
@@ -1463,33 +1557,51 @@ function submitOrder() {
   recordAnswer(isCorrect);
 }
 
-function selectMatchLeft(idx) {
+function pickMatchLeft(idx) {
+  if (quizAnswersLog[quizQIndex] !== undefined) return;
   quizMatchState.selectedLeft = idx;
   render();
 }
-function assignMatchRight(idx) {
+function pickMatchRight(idx) {
+  if (quizAnswersLog[quizQIndex] !== undefined) return;
   if (quizMatchState.selectedLeft === null) return;
   quizMatchState.pairs[quizMatchState.selectedLeft] = idx;
+  quizMatchState.selectedLeft = null;
+  render();
+}
+function resetPairs() {
+  quizMatchState.pairs = {};
   quizMatchState.selectedLeft = null;
   render();
 }
 function submitMatch() {
   const q = quizQuestions[quizQIndex];
   let isCorrect = true;
-  q.pairs.forEach((_, idx) => {
-    // poprawna para to left[idx] == right[idx]
+  q.pairs.forEach((p, idx) => {
     if (quizMatchState.pairs[idx] !== idx) isCorrect = false;
   });
   recordAnswer(isCorrect);
 }
 
+function pickHotspot(ptIdx) {
+  if (quizAnswersLog[quizQIndex] !== undefined) return;
+  quizSelection = ptIdx;
+  render();
+}
+function submitHotspot() {
+  const q = quizQuestions[quizQIndex];
+  const hs = q.hotspots && q.hotspots[quizSelection];
+  const isCorrect = hs && hs.correct === true;
+  recordAnswer(isCorrect);
+}
+
 function recordAnswer(isCorrect) {
   const q = quizQuestions[quizQIndex];
+  quizAnswersLog[quizQIndex] = { isCorrect, qId: q.id };
   if (isCorrect) {
     quizScore++;
     quizTopicScores[q.topic]++;
   }
-  quizAnswersLog[quizQIndex] = { isCorrect };
   render();
 }
 
@@ -1514,14 +1626,17 @@ function quitQuiz() {
 // 5. EKRAN WYNIKÓW
 // ----------------------------------------------------
 function finishQuiz() {
+  const mod = MODULES[currentModuleId];
   const total = quizQuestions.length;
   const pct = Math.round((quizScore / total) * 100);
 
-  if (!state.usedSets.includes(activeQuizSet)) {
-    state.usedSets.push(activeQuizSet);
+  if (!state.usedSets[currentModuleId]) state.usedSets[currentModuleId] = [];
+  if (!state.usedSets[currentModuleId].includes(activeQuizSet)) {
+    state.usedSets[currentModuleId].push(activeQuizSet);
   }
   state.history.push({
     date: new Date().toLocaleDateString('pl-PL'),
+    moduleId: currentModuleId,
     set: activeQuizSet,
     score: quizScore,
     total: total,
@@ -1535,26 +1650,24 @@ function finishQuiz() {
 }
 
 function renderResults(root) {
+  const mod = MODULES[currentModuleId];
   const total = quizQuestions.length;
   const pct = Math.round((quizScore / total) * 100);
 
-  // Znajdź 1 lub 2 najsłabsze tematy (gdzie zdobyto najmniej punktów)
   let weakestIdxs = [];
-  let minScore = 3;
   quizTopicScores.forEach((s, idx) => {
     if (s < 3) weakestIdxs.push(idx);
   });
-  if (weakestIdxs.length === 0) weakestIdxs = []; // bezbłędny test!
 
   let badgeTitle = 'Odkrywca Przyrody';
-  if (pct === 100) badgeTitle = 'Mistrz Okolicy (Bezbłędny wynik!) 🏆';
+  if (pct === 100) badgeTitle = 'Mistrz Przyrody (Bezbłędny wynik!) 🏆';
   else if (pct >= 85) badgeTitle = 'Znakomity Badacz Przyrody ⭐';
   else if (pct >= 65) badgeTitle = 'Dobry Przyrodnik 🌿';
   else badgeTitle = 'Młody Odkrywca (warto powtórzyć) 📖';
 
   let topicsHtml = '';
-  TOPICS.forEach((t, idx) => {
-    const sc = quizTopicScores[idx];
+  mod.topics.forEach((t, idx) => {
+    const sc = quizTopicScores[idx] || 0;
     topicsHtml += \`
       <div>
         <div class="topic-score-row">
@@ -1572,12 +1685,12 @@ function renderResults(root) {
   if (weakestIdxs.length > 0) {
     recHtml = \`
       <div class="recommend-card">
-        <h4>🎯 Rekomendacja przed sprawdzianem w szkole:</h4>
-        <p>Warto zajrzeć do trybu Nauka i powtórzyć następujące tematy:</p>
+        <h4>🎯 Rekomendacja przed sprawdzianem:</h4>
+        <p>Warto zajrzeć do trybu Nauka i powtórzyć poniższe tematy:</p>
         <div style="display:flex; flex-direction:column; gap:8px;">
           \${weakestIdxs.map(idx => \`
             <button class="small" onclick="openLearnTopic(\${idx})">
-              📖 Przejdź do: \${TOPICS[idx].title} (s. \${TOPICS[idx].pages}) →
+              📖 Przejdź do: \${mod.topics[idx].title} (s. \${mod.topics[idx].pages}) →
             </button>
           \`).join('')}
         </div>
@@ -1587,16 +1700,16 @@ function renderResults(root) {
     recHtml = \`
       <div style="background:var(--green-soft); border:1px solid #c8e6c9; border-radius:14px; padding:16px; margin-top:18px;">
         <h4 style="margin:0 0 4px; color:var(--green);">🌟 Bezbłędny test we wszystkich tematach!</h4>
-        <p style="margin:0; font-size:13px;">Świetnie opanowałeś materiał z Działu II. Możesz rozwiązać kolejny zestaw z nowymi zadaniami lub odpocząć!</p>
+        <p style="margin:0; font-size:13px;">Wspaniale opanowałeś materiał z: \${mod.title}. Możesz rozwiązać kolejny zestaw z nowymi pytaniami lub odpocząć!</p>
       </div>
     \`;
   }
 
   root.innerHTML = \`
     <div class="panel" style="text-align:center;">
-      <span class="status-pill status-active">Zestaw \${activeQuizSet} z 7 ukończony</span>
+      <span class="status-pill status-active">\${mod.title} • Zestaw \${activeQuizSet} z \${mod.maxSets} ukończony</span>
       <h2 style="font-size:26px; margin:10px 0 4px;">\${badgeTitle}</h2>
-      <p style="color:var(--muted); font-size:14px; margin:0;">Twój wynik z 18 zadań sprawdzianowych:</p>
+      <p style="color:var(--muted); font-size:14px; margin:0;">Twój wynik z \${total} zadań sprawdzianowych:</p>
 
       <div class="results-score-ring" style="--pct:\${pct};">
         <div class="results-score-inner">
@@ -1606,15 +1719,15 @@ function renderResults(root) {
       </div>
 
       <div style="text-align:left; margin:24px 0 16px;">
-        <h3 style="font-size:16px; margin-bottom:12px;">Szczegółowe wyniki w 6 tematach działu:</h3>
+        <h3 style="font-size:16px; margin-bottom:12px;">Szczegółowe wyniki w poszczególnych tematach:</h3>
         \${topicsHtml}
       </div>
 
       \${recHtml}
 
       <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:24px; padding-top:18px; border-top:1px solid var(--line);">
-        <button class="primary" onclick="startQuizAuto()">🚀 Rozwiąż kolejny test (inny zestaw pytań)</button>
-        <button onclick="openLearnList()">📖 Przejdź do Nauki</button>
+        <button class="primary" onclick="startQuizAuto('\${currentModuleId}')">🚀 Rozwiąż kolejny test (inny zestaw pytań)</button>
+        <button onclick="openLearnList('\${currentModuleId}')">📖 Przejdź do Nauki</button>
         <button class="outline" onclick="currentView='hub'; render();">🏠 Ekran główny</button>
       </div>
     </div>
