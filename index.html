@@ -1305,11 +1305,18 @@ function renderQuiz(root) {
     interactHtml += '<div class="bins-container">';
     q.bins.forEach((bName, bIdx) => {
       const inBin = quizBinsState.items.filter(it => it.bin === bIdx);
+      const isTargetActive = quizBinsState.selectedItem !== null;
       interactHtml += `
-        <div class="bin-col ${quizBinsState.selectedItem !== null ? 'active-target' : ''}" onclick="assignToBin(${bIdx})">
+        <div class="bin-col ${isTargetActive ? 'active-target' : ''}" onclick="assignToBin(${bIdx})">
           <div class="bin-title">📦 ${bName}</div>
-          <div style="display:flex; flex-direction:column; gap:4px;">
-            ${inBin.map(it => `<div class="item-chip" style="font-size:12px; padding:4px 8px;" onclick="event.stopPropagation(); unassignItem(${it.id});">${it.text} ✕</div>`).join('')}
+          ${isTargetActive ? `<div style="text-align:center; padding:6px; background:var(--lime); color:var(--brand); font-weight:800; font-size:12px; border-radius:8px; margin-bottom:8px; cursor:pointer;">⬇️ Kliknij, by włożyć</div>` : ''}
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            ${inBin.map(it => `
+              <div class="item-chip" style="font-size:13px; padding:6px 10px; display:flex; justify-content:space-between; align-items:center;">
+                <span>${it.text}</span>
+                ${!answered ? `<button type="button" style="background:#fee; border:1px solid #fcc; color:var(--red); font-weight:900; font-size:11px; padding:2px 8px; min-height:24px; border-radius:6px; margin-left:6px;" onclick="event.stopPropagation(); unassignItem(${it.id});">✕</button>` : ''}
+              </div>
+            `).join('')}
           </div>
         </div>
       `;
@@ -1426,9 +1433,9 @@ function renderQuiz(root) {
     const isCorrect = quizAnswersLog[quizQIndex].isCorrect;
     feedbackHtml = `
       <div class="feedback-box ${isCorrect ? '' : 'bad'}">
-        <h4>${isCorrect ? '✅ Świetnie! Prawidłowa odpowiedź' : '❌ Niestety, to nie jest poprawna odpowiedź'}</h4>
-        <p>${q.why}</p>
-        <div style="font-size:12px; color:var(--muted); margin-bottom:14px;"><strong>Źródło podręcznika:</strong> s. ${q.src}</div>
+        <h4 style="font-size:17px; margin-bottom:8px;">${isCorrect ? '✅ Świetnie! Prawidłowa odpowiedź (+1 pkt)' : '❌ Niestety, to nie jest poprawna odpowiedź (0 pkt)'}</h4>
+        <p style="font-size:14px; line-height:1.45; margin-bottom:10px;">${q.why}</p>
+        <div style="font-size:12px; color:var(--muted); margin-bottom:16px;"><strong>Źródło podręcznika:</strong> s. ${q.src}</div>
         <button class="accent" onclick="nextQuestion()">
           ${quizQIndex < quizQuestions.length - 1 ? 'Następne zadanie →' : 'Zobacz wynik testu 🏆'}
         </button>
@@ -1515,6 +1522,7 @@ function assignToBin(binIdx) {
 }
 function unassignItem(itemId) {
   if (quizAnswersLog[quizQIndex] !== undefined) return;
+  if (quizBinsState.selectedItem !== null) return;
   const it = quizBinsState.items.find(x => x.id === itemId);
   if (it) {
     it.bin = null;
@@ -1713,6 +1721,29 @@ function renderResults(root) {
       <div style="text-align:left; margin:24px 0 16px;">
         <h3 style="font-size:16px; margin-bottom:12px;">Szczegółowe wyniki w poszczególnych tematach:</h3>
         ${topicsHtml}
+      </div>
+
+      <div style="text-align:left; margin:24px 0 16px;">
+        <h3 style="font-size:16px; margin-bottom:12px;">Przegląd wszystkich pytań z tego testu:</h3>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          ${quizQuestions.map((q, idx) => {
+            const log = quizAnswersLog[idx] || {};
+            const ok = log.isCorrect;
+            return `
+              <div style="background:#fff; border:1px solid ${ok ? 'var(--green)' : '#ef9a9a'}; border-left:5px solid ${ok ? 'var(--green)' : 'var(--red)'}; padding:10px 14px; border-radius:10px; font-size:13px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; font-weight:700; margin-bottom:2px;">
+                  <span>Zadanie ${idx+1}: ${q.q.substring(0, 65)}${q.q.length > 65 ? '...' : ''}</span>
+                  <span class="status-pill ${ok ? 'status-active' : ''}" style="${ok ? '' : 'background:#ffebee; color:var(--red);'}">${ok ? '✓ 1 / 1 pkt' : '✗ 0 / 1 pkt'}</span>
+                </div>
+                ${!ok ? `
+                  <div style="margin-top:6px; font-size:12px; color:var(--ink); background:#fffaf9; padding:6px 10px; border-radius:6px; border:1px dashed #ffcdd2;">
+                    <strong>💡 Dlaczego tak?</strong> ${q.why} <em>(podręcznik s. ${q.src})</em>
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          }).join('')}
+        </div>
       </div>
 
       ${recHtml}
